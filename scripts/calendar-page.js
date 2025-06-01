@@ -122,39 +122,31 @@ button.addEventListener('click', function() {
 
 
 
-// Добавляем обработчик события ввода в поле поиска
 document.querySelector('.search-input').addEventListener('input', function(e) {
-const searchTerm = e.target.value.toLowerCase().trim();
-
-// Ищем во всех событиях календаря
-document.querySelectorAll('.event, .week-event').forEach(eventElement => {
-  const eventTitle = eventElement.querySelector('.event-title, .week-event-title')?.textContent.toLowerCase() || '';
+  const searchTerm = e.target.value.trim().toLowerCase();
   
-  if (eventTitle.includes(searchTerm)) {
-    eventElement.style.display = 'block'; // Показываем совпадение
-    
-    // Подсвечиваем найденный текст (опционально)
-    if (searchTerm.length > 0) {
-      const regex = new RegExp(searchTerm, 'gi');
-      const highlighted = eventTitle.replace(regex, match => `<span class="highlight">${match}</span>`);
-      eventElement.querySelector('.event-title, .week-event-title').innerHTML = highlighted;
-    }
-  } else {
-    eventElement.style.display = 'none'; // Скрываем несовпадающие
+  // Получаем все события календаря
+  const allEvents = document.querySelectorAll('.event');
+  
+  // Если поисковая строка пустая - показываем все события
+  if (searchTerm === '') {
+    allEvents.forEach(event => {
+      event.style.display = 'block';
+    });
+    return;
   }
-});
-
-// Если поле поиска пустое - показываем все события
-if (searchTerm === '') {
-  document.querySelectorAll('.event, .week-event').forEach(eventElement => {
-    eventElement.style.display = 'block';
-    // Убираем подсветку
-    const titleElement = eventElement.querySelector('.event-title, .week-event-title');
-    if (titleElement) {
-      titleElement.innerHTML = titleElement.textContent;
+  
+  // Ищем совпадения по первым символам
+  allEvents.forEach(event => {
+    const eventText = event.textContent.toLowerCase();
+    
+    // Проверяем, начинается ли текст события с поискового запроса
+    if (eventText.startsWith(searchTerm)) {
+      event.style.display = 'block';
+    } else {
+      event.style.display = 'none';
     }
   });
-}
 });
 
 
