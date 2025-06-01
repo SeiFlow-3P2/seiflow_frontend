@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Авторизация</title>
+  <link rel="stylesheet" href="login-page.css">
+</head>
+<body>
+
+  <div class="login-container">
+
+      <!-- Логотип -->
+    <div class="login-logo">
+      <p class="login-title">SeiFlow</p>
+    </div>
+
+
+    <!-- Декоративные круги -->
+    <div class="login-circle-1">
+      <svg width="291" height="291" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <g fill="white" stroke="none">
+          <circle cx="100" cy="60" r="50"/>
+          <circle cx="60" cy="100" r="50"/>
+          <circle cx="140" cy="100" r="50"/>
+          <circle cx="100" cy="140" r="50"/>
+        </g>
+      </svg>
+    </div>
+    <div class="login-circle-2">
+      <svg width="694" height="694" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="position:absolute; left:296px; bottom:-212px;">
+        <g fill="white" stroke="none">
+          <circle cx="100" cy="60" r="50"/>
+          <circle cx="60" cy="100" r="50"/>
+          <circle cx="140" cy="100" r="50"/>
+          <circle cx="100" cy="140" r="50"/>
+        </g>
+      </svg>
+      
+    </div>
+
+    <!-- Правая часть - форма авторизации -->
+    <div class="login-right">
+      <div class="login-form">
+        <p class="login-title">Авторизация</p>
+
+        <div class="login-button--input">
+            <input 
+              type="email" 
+              placeholder="Введите почтовый адрес" 
+              class="login-input" 
+              required
+              id="phone-input"
+            >
+            <input 
+              type="password" 
+              placeholder="Придумайте пароль" 
+              class="login-input" 
+              required
+              id="password-input"
+            >
+        </div>
+
+        <button class="login-button">
+          Зарегистрироваться
+        </button>
+
+        <p class="login-disclaimer">
+          Нажимая на кнопку я даю согласие на обработку моих
+          <a href="#" class="login-disclaimer-link"> персональных данных...</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
