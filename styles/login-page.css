@@ -1,0 +1,223 @@
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .login-container {
+      display: flex;
+      background-color: rgb(40, 138, 235);
+      min-height: 100dvh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Логотип */
+    .login-logo {
+      position: absolute;
+      top: 14px;
+      left: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+
+    /* Декоративные круги */
+    .login-circle-1 {
+      position: absolute;
+      bottom: 320px;
+      left: -46px;
+      width: 291px;
+        height: 291px;
+    }
+
+    
+    .login-circle-2 {
+      position: absolute;
+      bottom: -10px;
+      width: 694px;
+        height: 694px;
+    }
+
+    /* Правая часть - форма */
+    .login-right {
+      max-width: 720px;
+      max-height: 1027px;
+      background-color: #1E1E1E;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0px 118px;
+      margin-left: auto;
+      z-index: 1;
+    }
+
+    .login-form {
+      width: 100%;
+      max-width: 448px;
+      gap: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .login-title {
+      color: white;
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .login-button--input {
+      width: 100%;
+      max-width: 448px;
+      gap: 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+/*_______________________________*/
+        .login-input {
+        width: 100%;
+        position: relative;
+        background: #2A2A2A;
+        color: white;
+        border-radius: 12px;
+        padding: 16px;
+        border: none;
+        padding-right: 30px; /* Место для звездочки */
+        }
+
+        .required-asterisk {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: red;
+        pointer-events: none; /* Чтобы не мешала кликам */
+        }
+
+    .login-input:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgb(40, 138, 235);
+    }
+/*_______________________________*/
+    .login-button {
+      width: 100%;
+      background: rgb(40, 138, 235);
+      color: white;
+      border-radius: 12px;
+      padding: 16px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .login-button:hover {
+      background: rgb(16, 106, 195);
+    }
+
+/*_______________________________*/
+    .login-disclaimer {
+        align-self: stretch;
+        color: var(--white, #FFF);
+        font-family: var(--font-text-s-reg-14-font-family, "ALS Hauss");
+        font-size: var(--font-text-s-reg-14-font-size, 14px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: var(--font-text-s-reg-14-line-height, 18px); /* 128.571% */
+        letter-spacing: var(--font-text-s-reg-14-litter-spacing, 0px);
+    }
+
+    .login-disclaimer-link {
+        color: var(--text-brand-1, rgb(101, 171, 240));
+        font-family: var(--font-text-s-reg-14-font-family, "ALS Hauss");
+        font-size: var(--font-text-s-reg-14-font-size, 14px);
+        font-style: normal;
+        font-weight: 400;
+        line-height: var(--font-text-s-reg-14-line-height, 18px);
+        letter-spacing: var(--font-text-s-reg-14-litter-spacing, 0px);
+    }
+
+
+/*_______________________________*/
+
+    /* Добавим медиазапрос для 1024px */
+@media (max-width: 1400px) {
+  .login-right {
+    max-width: 500px; /* Уменьшаем ширину блока авторизации */
+    padding: 0 60px; /* Можно подстроить отступы */
+  }
+}
+
+/* Медиазапрос для планшетов и ниже */
+@media (max-width: 1024px) {
+  .login-right {
+    padding: 0 40px;
+  }
+
+  .login-title {
+    font-size: 36px;
+  }
+
+  .login-circle-1, .login-circle-2 {
+    width: 200px;
+    height: 200px;
+  }
+
+  .login-circle-2 {
+    bottom: -50px;
+  }
+
+  .login-input {
+    padding: 12px;
+  }
+
+  .login-button {
+    padding: 12px;
+  }
+}
+
+/* Медиазапрос для планшетов 768*/
+@media (max-width: 740px) {
+  .login-right {
+    z-index: 5;
+    position: relative;
+    width: 100%; /* Занимает всю ширину экрана */
+    max-width: none; /* Убираем ограничение по максимальной ширине */
+    padding: 0 20px; /* Добавьте отступы, если нужно */
+    background-color: #1E1E1E; /* Можно добавить фон, если нужно */
+  }
+}
+
+
+    
+    @media (max-width: 480px) {
+      .login-right {
+        padding: 0 20px; /* Ещё меньше отступов на маленьких экранах */
+      }
+    
+      .login-title {
+        font-size: 28px; /* Уменьшение размера заголовка */
+      }
+    
+      .login-circle-1, .login-circle-2 {
+        width: 150px; /* Ещё меньше круги */
+        height: 150px;
+      }
+    
+      .login-circle-2 {
+        bottom: -70px; /* Корректировка позиции */
+      }
+    
+      .login-input {
+        padding: 10px; /* Уменьшение отступов в полях ввода */
+      }
+    
+      .login-button {
+        padding: 10px; /* Уменьшение отступов в кнопке */
+      }
+    }
+    
