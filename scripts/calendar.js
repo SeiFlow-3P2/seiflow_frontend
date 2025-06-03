@@ -1,39 +1,6 @@
+
 document.addEventListener("DOMContentLoaded", () => {
-  lucide.createIcons();
-
-  // Utility function to sanitize input
-  const sanitizeInput = (input) => {
-    const div = document.createElement("div");
-    div.textContent = input;
-    return div.innerHTML;
-  };
-
-  // Base API URL
-  const API_BASE_URL = "http://localhost:8080/v1";
-
-  // Authentication headers
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("authToken") || "mock-token";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-  };
-
-  // Handle HTTP response
-  const handleResponse = async (response) => {
-    if (response.status === 401) {
-      alert("Необходима авторизация!");
-      window.location.href = "/login.html";
-      throw new Error("Unauthorized");
-    }
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`HTTP error ${response.status}: ${error}`);
-    }
-    if (response.status === 204) return {};
-    return response.json();
-  };
+  config.ui.lucide.initialize();
 
   // DOM Elements
   const calendarGrid = document.querySelector(".calendar-grid");
@@ -45,9 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const weekViewBtn = document.querySelector(".view-btn[data-view='week']");
   const newEventBtn = document.querySelector(".new-event-btn");
   const newEventModal = document.getElementById("new-event-modal");
-  const newEventModalOverlay = document.getElementById(
-    "new-event-modal-overlay"
-  );
+  const newEventModalOverlay = document.getElementById("new-event-modal-overlay");
   const eventTitleInput = document.getElementById("event-title");
   const eventStartDateInput = document.getElementById("event-start-date");
   const eventStartTimeInput = document.getElementById("event-start-time");
@@ -56,16 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const eventBoardSelect = document.getElementById("event-board");
   const eventColorInputs = document.querySelectorAll(".event-color");
   const eventDescriptionInput = document.getElementById("event-description");
-  const cancelNewEventBtn = document.querySelector(
-    "#new-event-modal .modal-cancel-btn"
-  );
-  const createEventBtn = document.querySelector(
-    "#new-event-modal .modal-save-btn"
-  );
+  const cancelNewEventBtn = document.querySelector("#new-event-modal .modal-cancel-btn");
+  const createEventBtn = document.querySelector("#new-event-modal .modal-save-btn");
   const eventDetailsModal = document.getElementById("event-details-modal");
-  const eventDetailsModalOverlay = document.getElementById(
-    "event-details-modal-overlay"
-  );
+  const eventDetailsModalOverlay = document.getElementById("event-details-modal-overlay");
   const eventDetailsContent = document.querySelector(".event-details-content");
   const editEventBtn = document.querySelector(".edit-event-btn");
   const deleteEventBtn = document.querySelector(".delete-event-btn");
@@ -81,11 +40,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fetch boards and tasks
   const fetchBoardsAndTasks = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/boards`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      const data = await handleResponse(response);
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.boards.list}`,
+        {
+          method: "GET",
+          headers: config.utils.getAuthHeaders(),
+        }
+      );
+      const data = await config.utils.handleResponse(response);
       boards = data.boards || [];
       tasks = boards
         .flatMap((board) =>
@@ -113,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     boards.forEach((board) => {
       const option = document.createElement("option");
       option.value = board.id;
-      option.textContent = sanitizeInput(board.name);
+      option.textContent = config.utils.sanitizeInput(board.name);
       eventBoardSelect.appendChild(option);
     });
   };
@@ -130,10 +92,10 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error("No default column found for the selected board");
       }
       const response = await fetch(
-        `${API_BASE_URL}/columns/${defaultColumn.id}/tasks`,
+        `${config.api.baseUrl}${config.api.endpoints.tasks.create(defaultColumn.id)}`,
         {
           method: "POST",
-          headers: getAuthHeaders(),
+          headers: config.utils.getAuthHeaders(),
           body: JSON.stringify({
             name: taskData.title,
             description: taskData.description || "",
@@ -142,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }),
         }
       );
-      const data = await handleResponse(response);
+      const data = await config.utils.handleResponse(response);
       await fetchBoardsAndTasks();
     } catch (e) {
       console.error("Error creating task:", e);
@@ -153,17 +115,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // Update task (event)
   const updateTask = async (taskId, taskData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-        method: "PATCH",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          name: taskData.title,
-          description: taskData.description,
-          deadline: taskData.start_time,
-          in_calendar: true,
-        }),
-      });
-      const data = await handleResponse(response);
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.tasks.update(taskId)}`,
+        {
+          method: "PATCH",
+          headers: config.utils.getAuthHeaders(),
+          body: JSON.stringify({
+            name: taskData.title,
+            description: taskData.description,
+            deadline: taskData.start_time,
+            in_calendar: true,
+          }),
+        }
+      );
+      const data = await config.utils.handleResponse(response);
       await fetchBoardsAndTasks();
     } catch (e) {
       console.error("Error updating task:", e);
@@ -174,11 +139,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Delete task (event)
   const deleteTask = async (taskId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-        method: "DELETE",
-        headers: getAuthHeaders(),
-      });
-      await handleResponse(response);
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.tasks.delete(taskId)}`,
+        {
+          method: "DELETE",
+          headers: config.utils.getAuthHeaders(),
+        }
+      );
+      await config.utils.handleResponse(response);
       await fetchBoardsAndTasks();
     } catch (e) {
       console.error("Error deleting task:", e);
@@ -255,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const eventEl = document.createElement("div");
         eventEl.classList.add("event");
         eventEl.style.backgroundColor = "#4CAF50"; // Default color
-        eventEl.textContent = sanitizeInput(task.name);
+        eventEl.textContent = config.utils.sanitizeInput(task.name);
         eventEl.dataset.taskId = task.id;
         eventEl.addEventListener("click", () => showTaskDetails(task));
         eventsContainer.appendChild(eventEl);
@@ -271,7 +239,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    lucide.createIcons();
+    config.ui.lucide.initialize({ container: calendarGrid });
   };
 
   // Render week view
@@ -317,7 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const eventEl = document.createElement("div");
           eventEl.classList.add("event");
           eventEl.style.backgroundColor = "#4CAF50";
-          eventEl.textContent = sanitizeInput(task.name);
+          eventEl.textContent = config.utils.sanitizeInput(task.name);
           eventEl.dataset.taskId = task.id;
           eventEl.addEventListener("click", () => showTaskDetails(task));
           timeSlot.appendChild(eventEl);
@@ -327,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    lucide.createIcons();
+    config.ui.lucide.initialize({ container: calendarGrid });
   };
 
   // Show day details
@@ -357,7 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const taskItem = document.createElement("li");
         taskItem.innerHTML = `
           <span style="color: #4CAF50">●</span>
-          ${sanitizeInput(task.name)} (${new Date(
+          ${config.utils.sanitizeInput(task.name)} (${new Date(
           task.deadline
         ).toLocaleTimeString("ru-RU", {
           hour: "2-digit",
@@ -374,12 +342,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Show task details
   const showTaskDetails = (task) => {
-    if (!eventDetailsModal || !eventDetailsContent || !eventDetailsModalOverlay)
-      return;
+    if (!eventDetailsModal || !eventDetailsContent || !eventDetailsModalOverlay) return;
     const taskDate = new Date(task.deadline);
     const endDate = new Date(taskDate.getTime() + 60 * 60 * 1000); // +1 hour
     eventDetailsContent.innerHTML = `
-      <h3>${sanitizeInput(task.name)}</h3>
+      <h3>${config.utils.sanitizeInput(task.name)}</h3>
       <p><strong>Время:</strong> ${taskDate.toLocaleString("ru-RU", {
         day: "numeric",
         month: "long",
@@ -387,11 +354,11 @@ document.addEventListener("DOMContentLoaded", () => {
         hour: "2-digit",
         minute: "2-digit",
       })} - ${endDate.toLocaleTimeString("ru-RU", {
-      hour: "2-digit",
-      minute: "2-digit",
-    })}</p>
-      <p><strong>Доска:</strong> ${sanitizeInput(task.board_name)}</p>
-      <p><strong>Описание:</strong> ${sanitizeInput(
+        hour: "2-digit",
+        minute: "2-digit",
+      })}</p>
+      <p><strong>Доска:</strong> ${config.utils.sanitizeInput(task.board_name)}</p>
+      <p><strong>Описание:</strong> ${config.utils.sanitizeInput(
         task.description || "Нет описания"
       )}</p>
     `;
@@ -422,22 +389,25 @@ document.addEventListener("DOMContentLoaded", () => {
         eventBoardSelect.value = task.board_id;
         newEventModal.style.display = "flex";
         newEventModalOverlay.style.display = "block";
+        eventTitleInput.focus();
+
         createEventBtn.onclick = async () => {
           const title = eventTitleInput.value.trim();
+          const startDateTime = `${eventStartDateInput.value}T${eventStartTimeInput.value}:00`;
+          const endDateTime = `${eventEndDateInput.value}T${eventEndTimeInput.value}:00`;
           const description = eventDescriptionInput.value.trim();
-          const startDateTime = new Date(
-            `${eventStartDateInput.value}T${eventStartTimeInput.value}`
-          );
-          if (title && startDateTime && eventBoardSelect.value) {
+          const boardId = eventBoardSelect.value;
+
+          if (title && startDateTime && endDateTime && boardId) {
             await updateTask(task.id, {
               title,
               description,
-              start_time: toRFC3339(startDateTime),
+              start_time: startDateTime,
             });
             newEventModal.style.display = "none";
             newEventModalOverlay.style.display = "none";
           } else {
-            alert("Заполните обязательные поля (название, время, доска)!");
+            alert("Заполните все обязательные поля!");
           }
         };
       }
@@ -445,21 +415,82 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Delete task
     deleteEventBtn.onclick = async () => {
-      if (
-        confirm(
-          `Вы уверены, что хотите удалить событие "${sanitizeInput(
-            task.name
-          )}"?`
-        )
-      ) {
+      if (confirm(`Удалить событие "${config.utils.sanitizeInput(task.name)}"?`)) {
         await deleteTask(task.id);
         eventDetailsModal.style.display = "none";
         eventDetailsModalOverlay.style.display = "none";
       }
     };
+
+    // Close task details
+    closeEventDetailsBtn.onclick = () => {
+      eventDetailsModal.style.display = "none";
+      eventDetailsModalOverlay.style.display = "none";
+    };
   };
 
-  // Navigation
+  // New event modal handling
+  if (newEventBtn && newEventModal && newEventModalOverlay) {
+    newEventBtn.addEventListener("click", () => {
+      if (
+        eventTitleInput &&
+        eventStartDateInput &&
+        eventStartTimeInput &&
+        eventEndDateInput &&
+        eventEndTimeInput &&
+        eventDescriptionInput &&
+        eventBoardSelect
+      ) {
+        eventTitleInput.value = "";
+        eventStartDateInput.value = new Date().toISOString().slice(0, 10);
+        eventStartTimeInput.value = new Date().toTimeString().slice(0, 5);
+        eventEndDateInput.value = new Date().toISOString().slice(0, 10);
+        eventEndTimeInput.value = new Date(
+          new Date().getTime() + 60 * 60 * 1000
+        )
+          .toTimeString()
+          .slice(0, 5);
+        eventDescriptionInput.value = "";
+        eventBoardSelect.value = "";
+        newEventModal.style.display = "flex";
+        newEventModalOverlay.style.display = "block";
+        eventTitleInput.focus();
+      }
+    });
+
+    createEventBtn.addEventListener("click", async () => {
+      const title = eventTitleInput.value.trim();
+      const startDateTime = `${eventStartDateInput.value}T${eventStartTimeInput.value}:00`;
+      const endDateTime = `${eventEndDateInput.value}T${eventEndTimeInput.value}:00`;
+      const description = eventDescriptionInput.value.trim();
+      const boardId = eventBoardSelect.value;
+
+      if (title && startDateTime && endDateTime && boardId) {
+        await createTask({
+          title,
+          description,
+          start_time: startDateTime,
+          board_id: boardId,
+        });
+        newEventModal.style.display = "none";
+        newEventModalOverlay.style.display = "none";
+      } else {
+        alert("Заполните все обязательные поля!");
+      }
+    });
+
+    cancelNewEventBtn.addEventListener("click", () => {
+      newEventModal.style.display = "none";
+      newEventModalOverlay.style.display = "none";
+    });
+
+    newEventModalOverlay.addEventListener("click", () => {
+      newEventModal.style.display = "none";
+      newEventModalOverlay.style.display = "none";
+    });
+  }
+
+  // Navigation and view handling
   if (prevMonthBtn) {
     prevMonthBtn.addEventListener("click", () => {
       currentDate.setMonth(currentDate.getMonth() - 1);
@@ -481,16 +512,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (monthViewBtn) {
+  if (monthViewBtn && weekViewBtn) {
     monthViewBtn.addEventListener("click", () => {
       currentView = "month";
       monthViewBtn.classList.add("active");
       weekViewBtn.classList.remove("active");
       renderCalendar();
     });
-  }
 
-  if (weekViewBtn) {
     weekViewBtn.addEventListener("click", () => {
       currentView = "week";
       weekViewBtn.classList.add("active");
@@ -499,85 +528,20 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // New event modal
-  if (newEventBtn) {
-    newEventBtn.addEventListener("click", () => {
-      if (
-        eventTitleInput &&
-        eventStartDateInput &&
-        eventStartTimeInput &&
-        eventEndDateInput &&
-        eventEndTimeInput &&
-        eventDescriptionInput &&
-        newEventModal &&
-        newEventModalOverlay
-      ) {
-        eventTitleInput.value = "";
-        eventStartDateInput.value = "";
-        eventStartTimeInput.value = "";
-        eventEndDateInput.value = "";
-        eventEndTimeInput.value = "";
-        eventDescriptionInput.value = "";
-        eventBoardSelect.value = "";
-        newEventModal.style.display = "flex";
-        newEventModalOverlay.style.display = "block";
-        eventTitleInput.focus();
-      }
-    });
-  }
-
-  if (cancelNewEventBtn && newEventModal && newEventModalOverlay) {
-    cancelNewEventBtn.addEventListener("click", () => {
-      newEventModal.style.display = "none";
-      newEventModalOverlay.style.display = "none";
-    });
-  }
-
-  if (newEventModalOverlay) {
-    newEventModalOverlay.addEventListener("click", () => {
-      newEventModal.style.display = "none";
-      newEventModalOverlay.style.display = "none";
-    });
-  }
-
-  if (createEventBtn) {
-    createEventBtn.addEventListener("click", async () => {
-      const title = eventTitleInput.value.trim();
-      const description = eventDescriptionInput.value.trim();
-      const startDateTime = new Date(
-        `${eventStartDateInput.value}T${eventStartTimeInput.value}`
-      );
-      const boardId = eventBoardSelect.value;
-      if (title && startDateTime && boardId) {
-        await createTask({
-          title,
-          description,
-          start_time: toRFC3339(startDateTime),
-          board_id: boardId,
-        });
+  // Escape key to close modals
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      if (newEventModal && newEventModal.style.display === "flex") {
         newEventModal.style.display = "none";
         newEventModalOverlay.style.display = "none";
-      } else {
-        alert("Заполните обязательные поля (название, время, доска)!");
       }
-    });
-  }
+      if (eventDetailsModal && eventDetailsModal.style.display === "flex") {
+        eventDetailsModal.style.display = "none";
+        eventDetailsModalOverlay.style.display = "none";
+      }
+    }
+  });
 
-  // Event details modal
-  if (closeEventDetailsBtn && eventDetailsModal && eventDetailsModalOverlay) {
-    closeEventDetailsBtn.addEventListener("click", () => {
-      eventDetailsModal.style.display = "none";
-      eventDetailsModalOverlay.style.display = "none";
-    });
-  }
-
-  if (eventDetailsModalOverlay) {
-    eventDetailsModalOverlay.addEventListener("click", () => {
-      eventDetailsModal.style.display = "none";
-      eventDetailsModalOverlay.style.display = "none";
-    });
-  }
-
-  // Initialize
+  // Initial load
   fetchBoardsAndTasks();
 });
