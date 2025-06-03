@@ -1,47 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  lucide.createIcons();
-
-  // Utility function to sanitize input
-  const sanitizeInput = (input) => {
-    const div = document.createElement("div");
-    div.textContent = input;
-    return div.innerHTML;
-  };
-
-  // Generate ID for mock resources
-  const generateId = (prefix) => {
-    return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
-  };
-
-  // Base API URL
-  const API_BASE_URL = "http://localhost:8080/v1";
-
-  // Simulated user_id (replace with actual authentication mechanism)
-  const USER_ID = "user123"; // TODO: Replace with actual user ID from auth
-
-  // Authentication headers
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("authToken") || "mock-token";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-  };
-
-  // Handle HTTP response
-  const handleResponse = async (response) => {
-    if (response.status === 401) {
-      alert("Необходима авторизация!");
-      window.location.href = "/login.html";
-      throw new Error("Unauthorized");
-    }
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`HTTP error ${response.status}: ${error}`);
-    }
-    if (response.status === 204) return {};
-    return response.json();
-  };
+  config.ui.lucide.initialize();
 
   // Extract boardId from URL
   const urlParams = new URLSearchParams(window.location.search);
@@ -52,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     alert(
       "Ошибка: Некорректный ID доски. Пожалуйста, выберите доску из панели управления."
     );
+    window.location.href = config.paths.boards;
     return;
   }
 
@@ -70,16 +29,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize board data from API
   const initializeBoardData = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      const data = await handleResponse(response);
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.boards.get(boardId)}`,
+        {
+          method: "GET",
+          headers: config.utils.getAuthHeaders(),
+        }
+      );
+      const data = await config.utils.handleResponse(response);
       const board = data.board;
-      title = sanitizeInput(board.name);
-      description = sanitizeInput(board.description);
-      category = sanitizeInput(board.category);
-      methodology = sanitizeInput(board.methodology);
+      title = config.utils.sanitizeInput(board.name);
+      description = config.utils.sanitizeInput(board.description);
+      category = config.utils.sanitizeInput(board.category);
+      methodology = config.utils.sanitizeInput(board.methodology);
       progress = `${board.progress}%`;
       lastEdited = new Date(board.updated_at).toLocaleString("ru-RU", {
         day: "numeric",
@@ -90,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
       columns = board.columns || [];
       tasks = board.columns.flatMap((col) => col.tasks || []) || [];
       resources = JSON.parse(
-        localStorage.getItem(`board-${boardId}-resources`) || "[]"
+        localStorage.getItem(config.storage.resources(boardId)) || "[]"
       );
 
       // Update DOM
@@ -108,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  // DOM Elements
+  // DOM Elements (оставлены как есть, предполагается наличие в HTML)
   const boardTitle = document.getElementById("board-title");
   const boardDescription = document.getElementById("board-description");
   const boardCategory = document.getElementById("board-category");
@@ -153,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelResourceBtn = document.getElementById("cancel-resource-btn");
   const resourcesList = document.getElementById("resources-list");
 
-  // Timer elements
+  // Timer elements (оставлены как есть)
   const timerDisplayTasks = document.getElementById("timer-display-tasks");
   const startButtonTasks = document.getElementById("start-button-tasks");
   const pauseButtonTasks = document.getElementById("pause-button-tasks");
@@ -197,86 +159,107 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // API Endpoints
   const postColumn = async (boardId, name) => {
-    const response = await fetch(`${API_BASE_URL}/boards/${boardId}/columns`, {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ name }),
-    });
-    return await handleResponse(response);
+    const response = await fetch(
+      `${config.api.baseUrl}${config.api.endpoints.columns.create(boardId)}`,
+      {
+        method: "POST",
+        headers: config.utils.getAuthHeaders(),
+        body: JSON.stringify({ name }),
+      }
+    );
+    return await config.utils.handleResponse(response);
   };
 
   const patchColumn = async (columnId, name) => {
-    const response = await fetch(`${API_BASE_URL}/columns/${columnId}`, {
-      method: "PATCH",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ name }),
-    });
-    return await handleResponse(response);
+    const response = await fetch(
+      `${config.api.baseUrl}${config.api.endpoints.columns.update(columnId)}`,
+      {
+        method: "PATCH",
+        headers: config.utils.getAuthHeaders(),
+        body: JSON.stringify({ name }),
+      }
+    );
+    return await config.utils.handleResponse(response);
   };
 
   const deleteColumn = async (columnId) => {
-    const response = await fetch(`${API_BASE_URL}/columns/${columnId}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
-    return await handleResponse(response);
+    const response = await fetch(
+      `${config.api.baseUrl}${config.api.endpoints.columns.delete(columnId)}`,
+      {
+        method: "DELETE",
+        headers: config.utils.getAuthHeaders(),
+      }
+    );
+    return await config.utils.handleResponse(response);
   };
 
   const postTask = async (columnId, taskData) => {
-    const response = await fetch(`${API_BASE_URL}/columns/${columnId}/tasks`, {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({
-        name: taskData.name,
-        description: taskData.description || "",
-        deadline: taskData.deadline,
-        in_calendar: taskData.in_calendar || false,
-      }),
-    });
-    return await handleResponse(response);
+    const response = await fetch(
+      `${config.api.baseUrl}${config.api.endpoints.tasks.create(columnId)}`,
+      {
+        method: "POST",
+        headers: config.utils.getAuthHeaders(),
+        body: JSON.stringify({
+          name: taskData.name,
+          description: taskData.description || "",
+          deadline: taskData.deadline,
+          in_calendar: taskData.in_calendar || false,
+        }),
+      }
+    );
+    return await config.utils.handleResponse(response);
   };
 
   const patchTask = async (taskId, taskData) => {
-    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-      method: "PATCH",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({
-        name: taskData.name,
-        description: taskData.description,
-        deadline: taskData.deadline,
-        in_calendar: taskData.in_calendar,
-        isCompleted: taskData.isCompleted,
-      }),
-    });
-    return await handleResponse(response);
+    const response = await fetch(
+      `${config.api.baseUrl}${config.api.endpoints.tasks.update(taskId)}`,
+      {
+        method: "PATCH",
+        headers: config.utils.getAuthHeaders(),
+        body: JSON.stringify({
+          name: taskData.name,
+          description: taskData.description,
+          deadline: taskData.deadline,
+          in_calendar: taskData.in_calendar,
+          isCompleted: taskData.isCompleted,
+        }),
+      }
+    );
+    return await config.utils.handleResponse(response);
   };
 
   const moveTask = async (taskId, newColumnId) => {
-    const response = await fetch(`${API_BASE_URL}/tasks/move/${newColumnId}`, {
-      method: "PATCH",
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ task_id: taskId }),
-    });
-    return await handleResponse(response);
+    const response = await fetch(
+      `${config.api.baseUrl}${config.api.endpoints.tasks.move(newColumnId)}`,
+      {
+        method: "PATCH",
+        headers: config.utils.getAuthHeaders(),
+        body: JSON.stringify({ task_id: taskId }),
+      }
+    );
+    return await config.utils.handleResponse(response);
   };
 
   const deleteTask = async (taskId) => {
-    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
-      method: "DELETE",
-      headers: getAuthHeaders(),
-    });
-    return await handleResponse(response);
+    const response = await fetch(
+      `${config.api.baseUrl}${config.api.endpoints.tasks.delete(taskId)}`,
+      {
+        method: "DELETE",
+        headers: config.utils.getAuthHeaders(),
+      }
+    );
+    return await config.utils.handleResponse(response);
   };
 
   const postResource = (resourceData) => {
     const newResource = {
-      id: generateId("resource"),
-      name: sanitizeInput(resourceData.name),
+      id: config.utils.generateId("resource"),
+      name: config.utils.sanitizeInput(resourceData.name),
       board_id: boardId,
     };
     resources.push(newResource);
     localStorage.setItem(
-      `board-${boardId}-resources`,
+      config.storage.resources(boardId),
       JSON.stringify(resources)
     );
     return newResource;
@@ -285,7 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const deleteResource = (resourceId) => {
     resources = resources.filter((resource) => resource.id !== resourceId);
     localStorage.setItem(
-      `board-${boardId}-resources`,
+      config.storage.resources(boardId),
       JSON.stringify(resources)
     );
     return {};
@@ -294,11 +277,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Save board progress and sync with dashboard
   const saveData = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      const data = await handleResponse(response);
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.boards.get(boardId)}`,
+        {
+          method: "GET",
+          headers: config.utils.getAuthHeaders(),
+        }
+      );
+      const data = await config.utils.handleResponse(response);
       const board = data.board;
       tasks = board.columns.flatMap((col) => col.tasks || []) || [];
       columns = board.columns || [];
@@ -330,20 +316,28 @@ document.addEventListener("DOMContentLoaded", () => {
           : "";
         taskItem.innerHTML = `
           <div class="task-content">
-            <span class="task-text">${sanitizeInput(task.name)}</span>
-            <span class="task-date">${sanitizeInput(formattedDeadline)}</span>
+            <span class="task-text">${config.utils.sanitizeInput(
+              task.name
+            )}</span>
+            <span class="task-date">${config.utils.sanitizeInput(
+              formattedDeadline
+            )}</span>
             <span class="task-column">[${
-              column ? sanitizeInput(column.name) : "Без колонки"
+              column ? config.utils.sanitizeInput(column.name) : "Без колонки"
             }]</span>
           </div>
           <button class="edit-task-btn" data-task-id="${
             task.id
-          }" aria-label="Редактировать задачу '${sanitizeInput(task.name)}'">
+          }" aria-label="Редактировать задачу '${config.utils.sanitizeInput(
+          task.name
+        )}'">
             <i data-lucide="edit" class="icon-edit" aria-hidden="true"></i>
           </button>
           <button class="delete-task-btn" data-task-id="${
             task.id
-          }" aria-label="Удалить задачу '${sanitizeInput(task.name)}'">
+          }" aria-label="Удалить задачу '${config.utils.sanitizeInput(
+          task.name
+        )}'">
             <i data-lucide="trash-2" class="icon-trash" aria-hidden="true"></i>
           </button>
         `;
@@ -403,7 +397,7 @@ document.addEventListener("DOMContentLoaded", () => {
           deleteBtn.addEventListener("click", async () => {
             if (
               confirm(
-                `Вы уверены, что хотите удалить задачу "${sanitizeInput(
+                `Вы уверены, что хотите удалить задачу "${config.utils.sanitizeInput(
                   task.name
                 )}"?`
               )
@@ -414,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
       });
-      lucide.createIcons();
+      config.ui.lucide.initialize({ container: tasksList });
     }
   };
 
@@ -435,18 +429,20 @@ document.addEventListener("DOMContentLoaded", () => {
           columnDiv.dataset.columnId = column.id;
           columnDiv.innerHTML = `
             <div class="scrum-column-header">
-              <h3>${sanitizeInput(column.name)}</h3>
+              <h3>${config.utils.sanitizeInput(column.name)}</h3>
               <div class="scrum-column-actions">
                 <button class="edit-column-btn" data-column-id="${
                   column.id
-                }" aria-label="Редактировать колонку '${sanitizeInput(
+                }" aria-label="Редактировать колонку '${config.utils.sanitizeInput(
             column.name
           )}'">
                   <i data-lucide="edit" class="icon-edit" aria-hidden="true"></i>
                 </button>
                 <button class="delete-column-btn" data-column-id="${
                   column.id
-                }" aria-label="Удалить колонку '${sanitizeInput(column.name)}'">
+                }" aria-label="Удалить колонку '${config.utils.sanitizeInput(
+            column.name
+          )}'">
                   <i data-lucide="trash-2" class="icon-trash" aria-hidden="true"></i>
                 </button>
               </div>
@@ -477,59 +473,67 @@ document.addEventListener("DOMContentLoaded", () => {
                   })
                 : "";
               let taskContent = `
-              <div class="task-content">
-                <span class="task-text">${sanitizeInput(task.name)}</span>
-                <span class="task-date">${sanitizeInput(
-                  formattedDeadline
-                )}</span>
-              </div>
-              <button class="edit-task-btn" data-task-id="${
-                task.id
-              }" aria-label="Редактировать задачу '${sanitizeInput(
-                task.name
-              )}'">
-                <i data-lucide="edit" class="icon-edit" aria-hidden="true"></i>
-              </button>
-              <button class="delete-task-btn" data-task-id="${
-                task.id
-              }" aria-label="Удалить задачу '${sanitizeInput(task.name)}'">
-                <i data-lucide="trash-2" class="icon-trash" aria-hidden="true"></i>
-              </button>
-              <select class="status-select" data-task-id="${task.id}">
-                ${columns
-                  .map(
-                    (col) =>
-                      `<option value="${col.id}" ${
-                        task.column_id === col.id ? "selected" : ""
-                      }>${sanitizeInput(col.name)}</option>`
-                  )
-                  .join("")}
-              </select>
-            `;
-              if (methodology.toLowerCase() === "none") {
-                taskContent = `
                 <div class="task-content">
-                  <input type="checkbox" class="task-checkbox" data-task-id="${
-                    task.id
-                  }" ${task.isCompleted ? "checked" : ""}>
-                  <span class="task-text">${sanitizeInput(task.name)}</span>
-                  <span class="task-date">${sanitizeInput(
+                  <span class="task-text">${config.utils.sanitizeInput(
+                    task.name
+                  )}</span>
+                  <span class="task-date">${config.utils.sanitizeInput(
                     formattedDeadline
                   )}</span>
                 </div>
                 <button class="edit-task-btn" data-task-id="${
                   task.id
-                }" aria-label="Редактировать задачу '${sanitizeInput(
-                  task.name
-                )}'">
+                }" aria-label="Редактировать задачу '${config.utils.sanitizeInput(
+                task.name
+              )}'">
                   <i data-lucide="edit" class="icon-edit" aria-hidden="true"></i>
                 </button>
                 <button class="delete-task-btn" data-task-id="${
                   task.id
-                }" aria-label="Удалить задачу '${sanitizeInput(task.name)}'">
+                }" aria-label="Удалить задачу '${config.utils.sanitizeInput(
+                task.name
+              )}'">
                   <i data-lucide="trash-2" class="icon-trash" aria-hidden="true"></i>
                 </button>
+                <select class="status-select" data-task-id="${task.id}">
+                  ${columns
+                    .map(
+                      (col) =>
+                        `<option value="${col.id}" ${
+                          task.column_id === col.id ? "selected" : ""
+                        }>${config.utils.sanitizeInput(col.name)}</option>`
+                    )
+                    .join("")}
+                </select>
               `;
+              if (methodology.toLowerCase() === "none") {
+                taskContent = `
+                  <div class="task-content">
+                    <input type="checkbox" class="task-checkbox" data-task-id="${
+                      task.id
+                    }" ${task.isCompleted ? "checked" : ""}>
+                    <span class="task-text">${config.utils.sanitizeInput(
+                      task.name
+                    )}</span>
+                    <span class="task-date">${config.utils.sanitizeInput(
+                      formattedDeadline
+                    )}</span>
+                  </div>
+                  <button class="edit-task-btn" data-task-id="${
+                    task.id
+                  }" aria-label="Редактировать задачу '${config.utils.sanitizeInput(
+                  task.name
+                )}'">
+                    <i data-lucide="edit" class="icon-edit" aria-hidden="true"></i>
+                  </button>
+                  <button class="delete-task-btn" data-task-id="${
+                    task.id
+                  }" aria-label="Удалить задачу '${config.utils.sanitizeInput(
+                  task.name
+                )}'">
+                    <i data-lucide="trash-2" class="icon-trash" aria-hidden="true"></i>
+                  </button>
+                `;
               }
               taskItem.innerHTML = taskContent;
               tasksList.appendChild(taskItem);
@@ -595,7 +599,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 deleteBtn.addEventListener("click", async () => {
                   if (
                     confirm(
-                      `Вы уверены, что хотите удалить задачу "${sanitizeInput(
+                      `Вы уверены, что хотите удалить задачу "${config.utils.sanitizeInput(
                         task.name
                       )}"?`
                     )
@@ -717,7 +721,7 @@ document.addEventListener("DOMContentLoaded", () => {
             deleteColumnBtn.addEventListener("click", async () => {
               if (
                 confirm(
-                  `Вы уверены, что хотите удалить колонку "${sanitizeInput(
+                  `Вы уверены, что хотите удалить колонку "${config.utils.sanitizeInput(
                     column.name
                   )}"? Все задачи в этой колонке будут удалены.`
                 )
@@ -729,7 +733,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
       }
-      lucide.createIcons();
+      config.ui.lucide.initialize({ container: scrumColumns });
     }
   };
 
@@ -746,11 +750,15 @@ document.addEventListener("DOMContentLoaded", () => {
           resourceItem.innerHTML = `
             <div class="resource-content">
               <i data-lucide="file" class="resource-icon"></i>
-              <span class="resource-name">${sanitizeInput(resource.name)}</span>
+              <span class="resource-name">${config.utils.sanitizeInput(
+                resource.name
+              )}</span>
             </div>
             <button class="delete-resource-btn" data-resource-id="${
               resource.id
-            }" aria-label="Удалить ресурс '${sanitizeInput(resource.name)}'">
+            }" aria-label="Удалить ресурс '${config.utils.sanitizeInput(
+            resource.name
+          )}'">
               <i data-lucide="trash-2" class="icon-trash" aria-hidden="true"></i>
             </button>
           `;
@@ -761,7 +769,7 @@ document.addEventListener("DOMContentLoaded", () => {
             deleteBtn.addEventListener("click", () => {
               if (
                 confirm(
-                  `Вы уверены, что хотите удалить ресурс "${sanitizeInput(
+                  `Вы уверены, что хотите удалить ресурс "${config.utils.sanitizeInput(
                     resource.name
                   )}"?`
                 )
@@ -773,7 +781,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
       }
-      lucide.createIcons();
+      config.ui.lucide.initialize({ container: resourcesList });
     }
   };
 
@@ -857,18 +865,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-          const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
-            method: "PATCH",
-            headers: getAuthHeaders(),
-            body: JSON.stringify({
-              name: newTitle,
-              description: newDescription,
-            }),
-          });
-          const data = await handleResponse(response);
+          const response = await fetch(
+            `${config.api.baseUrl}${config.api.endpoints.boards.get(boardId)}`,
+            {
+              method: "PATCH",
+              headers: config.utils.getAuthHeaders(),
+              body: JSON.stringify({
+                name: newTitle,
+                description: newDescription,
+              }),
+            }
+          );
+          const data = await config.utils.handleResponse(response);
           const board = data.board;
-          title = sanitizeInput(board.name);
-          description = sanitizeInput(board.description);
+          title = config.utils.sanitizeInput(board.name);
+          description = config.utils.sanitizeInput(board.description);
           lastEdited = new Date(board.updated_at).toLocaleString("ru-RU", {
             day: "numeric",
             month: "long",
@@ -1215,18 +1226,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (favoriteButton) {
     favoriteButton.addEventListener("click", async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
-          method: "PATCH",
-          headers: getAuthHeaders(),
-          body: JSON.stringify({ favorite: !favorite }),
-        });
-        const data = await handleResponse(response);
+        const response = await fetch(
+          `${config.api.baseUrl}${config.api.endpoints.boards.get(boardId)}`,
+          {
+            method: "PATCH",
+            headers: config.utils.getAuthHeaders(),
+            body: JSON.stringify({ favorite: !favorite }),
+          }
+        );
+        const data = await config.utils.handleResponse(response);
         favorite = data.board.favorite;
         const starIcon = favoriteButton.querySelector("i");
         if (starIcon) {
           starIcon.setAttribute("data-lucide", "star");
           starIcon.classList.toggle("favorite-active", favorite);
-          lucide.createIcons({ container: favoriteButton });
+          config.ui.lucide.initialize({ container: favoriteButton });
         }
       } catch (e) {
         console.error("Error updating favorite status:", e);
