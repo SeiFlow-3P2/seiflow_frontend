@@ -43,16 +43,25 @@
     <div class="login-right">
       <div class="login-form">
         <div class="form-tabs">
-          <button id="login-tab" class="tab active">Вход</button>
-          <button id="signup-tab" class="tab">Регистрация</button>
+          <button id="login-tab" class="tab active" aria-selected="true">Вход</button>
+          <button id="signup-tab" class="tab" aria-selected="false">Регистрация</button>
         </div>
         <p id="form-title" class="login-title">Вход</p>
         <form id="auth-form">
           <div class="login-button--input">
             <input type="email" placeholder="Введите почтовый адрес" class="login-input" required id="email-input"
-              value="test@gmail.com">
-            <input type="password" placeholder="Введите пароль" class="login-input" required id="password-input"
-              value="12345678">
+              name="email" autocomplete="username" value="test@example.com">
+            <div class="password-wrapper">
+              <input type="password" placeholder="Введите пароль" class="login-input" required id="password-input"
+                name="password" autocomplete="current-password" value="password123">
+              <button type="button" id="toggle-password" class="toggle-password">Показать</button>
+            </div>
+            <div id="confirm-password-wrapper" class="password-wrapper" style="display: none;">
+              <input type="password" placeholder="Подтвердите пароль" class="login-input" id="confirm-password-input"
+                name="confirm-password" autocomplete="new-password" style="display: none;">
+              <button type="button" id="toggle-confirm-password" class="toggle-password"
+                style="display: none;">Показать</button>
+            </div>
           </div>
           <p id="error-message" class="error-message" style="display: none; color: red;"></p>
           <button type="submit" class="login-button" id="submit-button">Войти</button>
@@ -62,9 +71,10 @@
           <a href="#" class="login-disclaimer-link">персональных данных...</a>
         </p>
       </div>
-    </div>
-  </div>
+      </div>
   <script src="./scripts/login.js"></script>
+  <script src="./scripts/env.js"></script>
+  <script src="./scripts/config.js"></script>
 </body>
 
 </html>
