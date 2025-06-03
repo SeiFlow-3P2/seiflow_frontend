@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const categoryButtons = document.querySelectorAll(".filter-category-button"); // Изменили на .filter-category-button
+  const categoryButtons = document.querySelectorAll(".filter-category-button"); 
   let boardCards = document.querySelectorAll(
     ".board-card:not(.new-board-card)"
   );
