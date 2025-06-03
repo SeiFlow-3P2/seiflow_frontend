@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./styles/dashboard-page.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <link rel="stylesheet" href="./styles/profile-modal.css">
+  <link rel="stylesheet" href="./styles/subscription-modal.css">
 </head>
 
 <body>
@@ -24,6 +25,9 @@
           <button class="notification-button" aria-label="Уведомления">
             <i data-lucide="bell" aria-hidden="true"></i>
             <span class="notification-badge"></span>
+          </button>
+          <button id="openSubscriptionInfoBtn" class="header-btn">
+            Оформить подписку
           </button>
           <div class="user-dropdown">
             <button class="user-button" aria-label="Открыть меню пользователя">
@@ -317,6 +321,95 @@
       </div>
     </div>
   </div>
+
+  <div class="modal-overlay" id="subscriptionInfoModal" aria-hidden="true">
+    <div class="modal-container">
+      <div class="modal-accent-bar"></div>
+      <button class="modal-close-btn" id="closeInfoModalBtn">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="modal-content">
+        <h2 class="modal-title">Оформить подписку</h2>
+        <div class="subscription-content">
+          <div class="subscription-header">
+            <h3 class="subscription-title">Премиум подписка</h3>
+            <p class="subscription-description">
+              Получите доступ ко всем функциям системы с нашей премиум подпиской.
+            </p>
+          </div>
+          <div class="features-box">
+            <h4 class="features-title">Что включено:</h4>
+            <ul class="features-list">
+              <li class="feature-item">
+                <i class="feature-icon" data-lucide="check-circle"></i>
+                Полный доступ ко всем функциям
+              </li>
+              <li class="feature-item">
+                <i class="feature-icon" data-lucide="check-circle"></i>
+                Приоритетная техническая поддержка
+              </li>
+              <li class="feature-item">
+                <i class="feature-icon" data-lucide="check-circle"></i>
+                Регулярные обновления
+              </li>
+              <li class="feature-item">
+                <i class="feature-icon" data-lucide="check-circle"></i>
+                Неограниченное количество проектов
+              </li>
+            </ul>
+          </div>
+          <div class="subscription-footer">
+            <div class="price-container">
+              <span class="price">499 ₽</span>
+              <span class="price-period">/мес</span>
+              <p class="price-note">Без скрытых платежей</p>
+            </div>
+            <button class="submit-btn" id="goToPaymentBtn">
+              Перейти к оплате
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="modal-overlay" id="subscriptionFormModal" aria-hidden="true">
+    <div class="modal-container">
+      <div class="modal-accent-bar"></div>
+      <button class="modal-close-btn" id="closeFormModalBtn">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="modal-content">
+        <h2 class="modal-title">Оплата подписки</h2>
+        <div class="subscription-content">
+          <div class="payment-header">
+            <span class="payment-text">Первый месяц подписки</span>
+            <span class="payment-amount">499,00 ₽</span>
+          </div>
+          <div class="payment-header">
+            <span class="payment-text">К оплате</span>
+            <span class="payment-amount">499,00 ₽</span>
+          </div>
+          <form id="subscriptionForm" class="subscription-form">
+            <div class="form-group">
+              <label for="card" class="form-label">Данные карты</label>
+              <div class="input-container">
+                <i class="input-icon" data-lucide="credit-card"></i>
+                <input type="text" id="card" class="form-input" placeholder="1234 1234 1234 1234" maxlength="19">
+              </div>
+              <span id="card-error" class="error-message"></span>
+            </div>
+            <p class="terms-text">
+              Нажимая кнопку "Оплатить", вы соглашаетесь с
+              <a href="#" class="terms-link">условиями использования</a> и
+              <a href="#" class="terms-link">политикой конфиденциальности</a>
+            </p>
+            <button type="submit" class="submit-btn">Оплатить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Восстанавливаем состояние фильтров
@@ -391,6 +484,9 @@
   <script src="./scripts/syncDashboard.js"></script>
   <script src="./scripts/utils.js"></script>
   <script src="./scripts/profile-modal.js"></script>
+  <script src="./scripts/subscription-modal.js"></script>
+  <script src="./scripts/env.js"></script>
+  <script src="./scripts/config.js"></script>
 </body>
 
 </html>
