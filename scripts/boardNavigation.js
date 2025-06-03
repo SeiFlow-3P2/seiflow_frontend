@@ -1,7 +1,8 @@
+
 document.addEventListener("DOMContentLoaded", () => {
-  const boardCards = document.querySelectorAll(
-    ".board-card:not(.new-board-card)"
-  );
+  config.ui.lucide.initialize();
+
+  const boardCards = document.querySelectorAll(".board-card:not(.new-board-card)");
 
   boardCards.forEach((card) => {
     card.addEventListener("click", (e) => {
@@ -10,8 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
         !e.target.closest(".more-options-menu")
       ) {
         const boardId = card.getAttribute("data-board-id");
-        window.location.href = `board.html?boardId=${boardId}`;
+        window.location.href = config.paths.board(boardId);
       }
     });
   });
 });
+
