@@ -1,0 +1,385 @@
+:root {
+    --blue: #3b82f6;
+    --blue-hover: #2563eb;
+    --blue-active: #1d4ed8;
+    --blue-focus: rgba(59, 130, 246, 0.3);
+    --dark-bg: #0f172a;
+    --darker-bg: #0a1624;
+    --gray-800: #1e293b;
+    --gray-700: #334155;
+    --gray-600: #475569;
+    --gray-500: #64748b;
+    --gray-400: #94a3b8;
+    --gray-300: #cbd5e1;
+    --gray-200: #e2e8f0;
+    --white: #ffffff;
+    --red: #f87171;
+    --transition: all 0.2s ease;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--dark-bg);
+    color: var(--white);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* Шапка */
+.app-header {
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-btn {
+    background-color: var(--blue);
+    color: var(--white);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.875rem;
+}
+
+.header-btn:hover {
+    background-color: var(--blue-hover);
+}
+
+/* Модальные окна */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay[aria-hidden="false"] {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-container {
+    background-color: var(--darker-bg);
+    border-radius: 0.375rem;
+    max-width: 28rem;
+    width: 100%;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.modal-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.modal-accent-bar {
+    height: 0.5rem;
+    background-color: var(--blue);
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.modal-close-btn {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    transform: translateY(-0.25rem);
+    color: var(--gray-400);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    z-index: 1;
+    margin-top: 1.2rem;
+
+}
+
+.modal-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--white);
+    padding-right: 2rem;
+    margin-top: 0.25rem;
+}
+
+/* Контент подписки */
+.subscription-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 1.5rem;
+}
+
+.subscription-header {
+    text-align: center;
+}
+
+.subscription-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.subscription-description {
+    color: var(--gray-300);
+}
+
+.features-box {
+    background-color: var(--gray-800);
+    border-radius: 0.375rem;
+    padding: 1.25rem;
+    flex-grow: 1;
+}
+
+.features-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.features-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.feature-icon {
+    color: var(--blue);
+    flex-shrink: 0;
+}
+
+.subscription-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.price-container {
+    text-align: center;
+}
+
+.price {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.price-period {
+    font-size: 1rem;
+    color: var(--gray-400);
+    margin-left: 0.25rem;
+}
+
+.price-note {
+    color: var(--gray-400);
+    font-size: 0.875rem;
+}
+
+/* Форма */
+.subscription-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-label {
+    color: var(--gray-300);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0.75rem;
+    pointer-events: none;
+    color: var(--gray-400);
+    margin-top: 0.25rem;
+
+}
+
+.form-input {
+    background-color: var(--gray-700);
+    color: var(--white);
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--gray-600);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-input.error {
+    border-color: var(--red);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px var(--blue-focus);
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 0.75rem;
+    background: none;
+    border: none;
+    color: var(--gray-500);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.password-toggle-btn:hover {
+    color: var(--gray-300);
+}
+
+.error-message {
+    font-size: 0.75rem;
+    color: var(--red);
+    /* min-height: 1rem;
+    margin-top: 0.25rem; */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.error-message.visible {
+    opacity: 1;
+}
+
+.submit-btn {
+    width: 100%;
+    background-color: var(--blue);
+    color: var(--white);
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1rem;
+}
+
+.submit-btn:hover {
+    background-color: var(--blue-hover);
+}
+
+.submit-btn:active {
+    background-color: var(--blue-active);
+}
+
+.terms-text {
+    font-size: 0.875rem;
+    color: var(--gray-400);
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.terms-link {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+.terms-link:hover {
+    text-decoration: underline;
+}
+
+.payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--gray-600);
+    padding-bottom: 0.75rem;
+}
+
+.payment-text {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+.payment-amount {
+    font-size: 1rem;
+    font-weight: 600;
+    color: ffffff;
+}
+
+
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .modal-container {
+        max-width: 100%;
+        margin: 0.5rem;
+    }
+
+    .modal-content {
+        padding: 1rem;
+    }
+
+    .modal-close-btn {
+        right: 1rem;
+        top: 1rem;
+        transform: none;
+    }
+
+    .modal-title,
+    .subscription-title {
+        margin-top: 0;
+    }
+}
