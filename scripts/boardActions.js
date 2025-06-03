@@ -1,53 +1,26 @@
+
 document.addEventListener("DOMContentLoaded", () => {
   const boardsGrid = document.getElementById("boardsGrid");
   const createBoardBtn = document.getElementById("create-board-btn");
   const createBoardModal = document.getElementById("create-board-modal");
-  const createBoardModalOverlay = document.getElementById(
-    "create-board-modal-overlay"
-  );
+  const createBoardModalOverlay = document.getElementById("create-board-modal-overlay");
   const modalBoardName = document.getElementById("modal-board-name");
-  const modalBoardDescription = document.getElementById(
-    "modal-board-description"
-  );
-  const modalBoardMethodology = document.getElementById(
-    "modal-board-methodology"
-  );
+  const modalBoardDescription = document.getElementById("modal-board-description");
+  const modalBoardMethodology = document.getElementById("modal-board-methodology");
   const modalBoardCategory = document.getElementById("modal-board-category");
   const saveBoardBtn = document.getElementById("save-create-board-btn");
   const cancelBoardBtn = document.getElementById("cancel-create-board-btn");
-  const API_BASE_URL = "http://localhost:8080/v1";
-  const USER_ID = "user123";
-
-  const sanitizeInput = (input) => {
-    const div = document.createElement("div");
-    div.textContent = input;
-    return div.innerHTML;
-  };
-
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("authToken") || "mock-token";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-  };
-
-  const handleResponse = async (response) => {
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`HTTP error ${response.status}: ${error}`);
-    }
-    if (response.status === 204) return {};
-    return response.json();
-  };
 
   const updateBoardCards = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/boards`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      const data = await handleResponse(response);
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.boards.list}`,
+        {
+          method: "GET",
+          headers: config.utils.getAuthHeaders(),
+        }
+      );
+      const data = await config.utils.handleResponse(response);
       const boards = data.boards;
 
       if (boardsGrid) {
@@ -59,28 +32,22 @@ document.addEventListener("DOMContentLoaded", () => {
           boardCard.dataset.category = board.category;
           boardCard.innerHTML = `
             <div class="board-card-header">
-              <h3 class="board-title">${sanitizeInput(board.name)}</h3>
+              <h3 class="board-title">${config.utils.sanitizeInput(board.name)}</h3>
               <button class="board-favorite-button" aria-label="${
-                board.favorite
-                  ? "Удалить из избранного"
-                  : "Добавить в избранное"
+                board.favorite ? "Удалить из избранного" : "Добавить в избранное"
               }">
-                <i data-lucide="star" class="${
-                  board.favorite ? "favorite-active" : ""
-                }"></i>
+                <i data-lucide="star" class="${board.favorite ? "favorite-active" : ""}"></i>
               </button>
               <button class="board-action-button" aria-label="Дополнительные действия">
                 <i data-lucide="more-horizontal"></i>
               </button>
               <div class="more-options-menu" style="display: none;">
-                <button class="delete-board" data-board-id="${
-                  board.id
-                }" aria-label="Удалить доску '${sanitizeInput(board.name)}'">
+                <button class="delete-board" data-board-id="${board.id}" aria-label="Удалить доску '${config.utils.sanitizeInput(board.name)}'">
                   Удалить
                 </button>
               </div>
             </div>
-            <p class="board-description">${sanitizeInput(board.description)}</p>
+            <p class="board-description">${config.utils.sanitizeInput(board.description)}</p>
             <div class="board-info">
               <div class="progress-info">
                 <span>${board.progress}%</span>
@@ -88,10 +55,8 @@ document.addEventListener("DOMContentLoaded", () => {
                   <div class="progress" style="width: ${board.progress}%"></div>
                 </div>
               </div>
-              <p class="board-methodology">Методология: ${sanitizeInput(
-                board.methodology
-              )}</p>
-              <p class="board-last-edited">Последнее редактирование: ${sanitizeInput(
+              <p class="board-methodology">Методология: ${config.utils.sanitizeInput(board.methodology)}</p>
+              <p class="board-last-edited">Последнее редактирование: ${config.utils.sanitizeInput(
                 new Date(board.updated_at).toLocaleString("ru-RU", {
                   day: "numeric",
                   month: "long",
@@ -102,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
           `;
           boardsGrid.appendChild(boardCard);
         });
-        lucide.createIcons();
+        config.ui.lucide.initialize({ container: boardsGrid });
       }
     } catch (e) {
       console.error("Ошибка при загрузке досок:", e);
@@ -112,18 +77,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const createBoard = async (name, description, methodology, category) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/boards`, {
+      const response = await fetch(`${config.api.baseUrl}${config.api.endpoints.boards.create}`, {
         method: "POST",
-        headers: getAuthHeaders(),
+        headers: config.utils.getAuthHeaders(),
         body: JSON.stringify({
           name,
           description,
           methodology,
           category,
-          user_id: USER_ID,
+          user_id: "user123", // Замените на реальный USER_ID при необходимости
         }),
       });
-      const data = await handleResponse(response);
+      const data = await config.utils.handleResponse(response);
       await updateBoardCards();
       return data.board;
     } catch (e) {
@@ -153,16 +118,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const boardCard = favoriteButton.closest(".board-card");
         const boardId = boardCard.dataset.boardId;
         try {
-          const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
-            method: "PATCH",
-            headers: getAuthHeaders(),
-            body: JSON.stringify({
-              favorite: !favoriteButton
-                .querySelector("i")
-                .classList.contains("favorite-active"),
-            }),
-          });
-          await handleResponse(response);
+          const response = await fetch(
+            `${config.api.baseUrl}${config.api.endpoints.boards.get(boardId)}`,
+            {
+              method: "PATCH",
+              headers: config.utils.getAuthHeaders(),
+              body: JSON.stringify({
+                favorite: !favoriteButton
+                  .querySelector("i")
+                  .classList.contains("favorite-active"),
+              }),
+            }
+          );
+          await config.utils.handleResponse(response);
           await updateBoardCards();
         } catch (e) {
           console.error("Ошибка при обновлении статуса избранного:", e);
@@ -177,17 +145,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const boardTitle = boardCard.querySelector(".board-title").textContent;
         if (
           confirm(
-            `Вы уверены, что хотите удалить доску "${sanitizeInput(
+            `Вы уверены, что хотите удалить доску "${config.utils.sanitizeInput(
               boardTitle
             )}"?`
           )
         ) {
           try {
-            const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
-              method: "DELETE",
-              headers: getAuthHeaders(),
-            });
-            await handleResponse(response);
+            const response = await fetch(
+              `${config.api.baseUrl}${config.api.endpoints.boards.get(boardId)}`,
+              {
+                method: "DELETE",
+                headers: config.utils.getAuthHeaders(),
+              }
+            );
+            await config.utils.handleResponse(response);
             await updateBoardCards();
             const menu = deleteButton.closest(".more-options-menu");
             if (menu) menu.style.display = "none";
@@ -286,8 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
       createBoardModal.style.display === "flex"
     ) {
       createBoardModal.style.display = "none";
-      if (createBoardModalOverlay)
-        createBoardModalOverlay.style.display = "none";
+      if (createBoardModalOverlay) createBoardModalOverlay.style.display = "none";
     }
   });
 
