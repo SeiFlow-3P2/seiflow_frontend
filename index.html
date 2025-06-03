@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SeiFlow - Персонализированная организация жизни</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/landing-page.css">
+</head>
+
+<body>
+  <div class="page-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-container">
+        <div class="header-content">
+          <div class="logo">
+            <span class="logo-text">SeiFlow</span>
+          </div>
+          <nav class="desktop-nav">
+            <a href="#features" class="nav-link">Возможности</a>
+            <a href="#boards" class="nav-link">Доски</a>
+            <a href="#services" class="nav-link">Сервисы</a>
+          </nav>
+          <div class="auth-buttons">
+            <button class="login-button" onclick="window.location.href='login-page.html'">Войти</button>
+            <button class="register-button" onclick="window.location.href='login-page.html'">Регистрация</button>
+          </div>
+          <div class="mobile-menu-button">
+            <button id="mobile-menu-toggle" class="menu-toggle">
+              <svg id="menu-icon" class="menu-icon" viewBox="0 0 24 24">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+              <svg id="close-icon" class="close-icon" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="mobile-menu" class="mobile-menu">
+        <div class="mobile-nav-links">
+          <a href="#features" class="mobile-nav-link" data-scroll>Возможности</a>
+          <a href="#services" class="mobile-nav-link" data-scroll>Сервисы</a>
+          <a href="#boards" class="mobile-nav-link" data-scroll>Доски</a>
+          <a href="#pricing" class="mobile-nav-link" data-scroll>Тарифы</a>
+        </div>
+        <div class="mobile-auth-buttons">
+          <div class="mobile-login-button-container">
+            <button class="mobile-login-button" onclick="window.location.href='login-page.html'">Войти</button>
+          </div>
+          <div class="mobile-register-button-container">
+            <button class="mobile-register-button" onclick="window.location.href='login-page.html'">Регистрация</button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Остальные секции без изменений -->
+    <section class="hero">
+      <div class="hero-container">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            <span class="highlight">SeiFlow</span> – интеллектуальная платформа для персонализированной организации
+            жизни
+          </h1>
+          <p class="hero-subtitle">
+            Создавайте пользовательские доски для любых целей и объединяйте все аспекты вашей жизни в одном месте
+          </p>
+          <div class="hero-buttons">
+            <button class="primary-button" onclick="window.location.href='login-page.html'">Начать бесплатно</button>
+            <button class="secondary-button">Демо-версия</button>
+          </div>
+        </div>
+        <div class="hero-image-container">
+          <div class="hero-image">
+            <p class="image-placeholder">Интерфейс платформы SeiFlow</p>
+          </div>
+          <div class="decorative-element purple-blob"></div>
+          <div class="decorative-element blue-blob"></div>
+        </div>
+      </div>
+    </section>
+    <!-- Features, Services, Boards, CTA, Footer без изменений -->
+    <section id="features" class="features">...</section>
+    <section id="services" class="services">...</section>
+    <section id="boards" class="boards">...</section>
+    <section class="cta">...</section>
+    <footer class="footer">...</footer>
+  </div>
+  <script src="./scripts/landing.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      const menuIcon = document.getElementById('menu-icon');
+      const closeIcon = document.getElementById('close-icon');
+      mobileMenuToggle.addEventListener('click', function () {
+        const isOpen = mobileMenu.classList.toggle('hidden');
+        if (isOpen) {
+          menuIcon.style.display = 'block';
+          closeIcon.style.display = 'none';
+        } else {
+          menuIcon.style.display = 'none';
+          closeIcon.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
