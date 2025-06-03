@@ -8,13 +8,39 @@ document.addEventListener("DOMContentLoaded", () => {
     return div.innerHTML;
   };
 
-  // Generate a unique ID (simple incrementing counter stored in localStorage)
-  const generateId = (type) => {
-    const key = `${type}-id-counter`;
-    let counter = parseInt(localStorage.getItem(key) || "0", 10);
-    counter += 1;
-    localStorage.setItem(key, counter.toString());
-    return counter.toString();
+  // Generate ID for mock resources
+  const generateId = (prefix) => {
+    return `${prefix}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  // Base API URL
+  const API_BASE_URL = "http://localhost:8080/v1";
+
+  // Simulated user_id (replace with actual authentication mechanism)
+  const USER_ID = "user123"; // TODO: Replace with actual user ID from auth
+
+  // Authentication headers
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("authToken") || "mock-token";
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+  };
+
+  // Handle HTTP response
+  const handleResponse = async (response) => {
+    if (response.status === 401) {
+      alert("Необходима авторизация!");
+      window.location.href = "/login.html";
+      throw new Error("Unauthorized");
+    }
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`HTTP error ${response.status}: ${error}`);
+    }
+    if (response.status === 204) return {};
+    return response.json();
   };
 
   // Extract boardId from URL
@@ -36,49 +62,51 @@ document.addEventListener("DOMContentLoaded", () => {
   let methodology = "Методология не указана";
   let progress = "0%";
   let lastEdited = "Не указано";
+  let columns = [];
+  let tasks = [];
+  let resources = [];
+  let favorite = false;
 
-  // Safely decode URI components with fallback
-  try {
-    const titleParam = urlParams.get("title");
-    if (titleParam) title = sanitizeInput(decodeURIComponent(titleParam));
-  } catch (e) {
-    console.warn("Invalid title encoding, using default:", e);
-  }
-  try {
-    const descriptionParam = urlParams.get("description");
-    if (descriptionParam)
-      description = sanitizeInput(decodeURIComponent(descriptionParam));
-  } catch (e) {
-    console.warn("Invalid description encoding, using default:", e);
-  }
-  try {
-    const categoryParam = urlParams.get("category");
-    if (categoryParam)
-      category = sanitizeInput(decodeURIComponent(categoryParam));
-  } catch (e) {
-    console.warn("Invalid category encoding, using default:", e);
-  }
-  try {
-    const methodologyParam = urlParams.get("methodology");
-    if (methodologyParam)
-      methodology = sanitizeInput(decodeURIComponent(methodologyParam));
-  } catch (e) {
-    console.warn("Invalid methodology encoding, using default:", e);
-  }
-  try {
-    const progressParam = urlParams.get("progress");
-    if (progressParam)
-      progress = sanitizeInput(decodeURIComponent(progressParam));
-  } catch (e) {
-    console.warn("Invalid progress encoding, using default:", e);
-  }
-  try {
-    const lastEditedParam = urlParams.get("lastEdited");
-    if (lastEditedParam)
-      lastEdited = sanitizeInput(decodeURIComponent(lastEditedParam));
-  } catch (e) {
-    console.warn("Invalid lastEdited encoding, using default:", e);
-  }
+  // Initialize board data from API
+  const initializeBoardData = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      const data = await handleResponse(response);
+      const board = data.board;
+      title = sanitizeInput(board.name);
+      description = sanitizeInput(board.description);
+      category = sanitizeInput(board.category);
+      methodology = sanitizeInput(board.methodology);
+      progress = `${board.progress}%`;
+      lastEdited = new Date(board.updated_at).toLocaleString("ru-RU", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      favorite = board.favorite || false;
+      columns = board.columns || [];
+      tasks = board.columns.flatMap((col) => col.tasks || []) || [];
+      resources = JSON.parse(
+        localStorage.getItem(`board-${boardId}-resources`) || "[]"
+      );
+
+      // Update DOM
+      if (boardTitle) boardTitle.textContent = title;
+      if (boardDescription) boardDescription.textContent = description;
+      if (boardCategory) boardCategory.textContent = `Категория: ${category}`;
+      if (boardMethodology)
+        boardMethodology.textContent = `Методология: ${methodology}`;
+      if (boardProgress) boardProgress.textContent = `Прогресс: ${progress}`;
+      if (boardLastEdited)
+        boardLastEdited.textContent = `Последнее изменение: ${lastEdited}`;
+    } catch (e) {
+      console.warn("Error fetching board data, using defaults:", e);
+      alert("Ошибка при загрузке данных доски!");
+    }
+  };
 
   // DOM Elements
   const boardTitle = document.getElementById("board-title");
@@ -125,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelResourceBtn = document.getElementById("cancel-resource-btn");
   const resourcesList = document.getElementById("resources-list");
 
-  // Timer elements for "Tasks" tab
+  // Timer elements
   const timerDisplayTasks = document.getElementById("timer-display-tasks");
   const startButtonTasks = document.getElementById("start-button-tasks");
   const pauseButtonTasks = document.getElementById("pause-button-tasks");
@@ -137,8 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const timerOptionsTasks = document.querySelectorAll(
     "#tasks .timer-options button"
   );
-
-  // Timer elements for "Resources" tab
   const timerDisplayResources = document.getElementById(
     "timer-display-resources"
   );
@@ -161,163 +187,88 @@ document.addEventListener("DOMContentLoaded", () => {
     "#resources .timer-options button"
   );
 
-  // Favorite button for the board
+  // Favorite button
   const favoriteButton = document.querySelector(".board-favorite-button");
 
-  // State management
-  let columns = JSON.parse(
-    localStorage.getItem(`board-${boardId}-columns`) || "[]"
-  );
-  let tasks = JSON.parse(
-    localStorage.getItem(`board-${boardId}-tasks`) || "[]"
-  );
-  let resources = JSON.parse(
-    localStorage.getItem(`board-${boardId}-resources`) || "[]"
-  );
-  let boards = JSON.parse(localStorage.getItem("boards") || "[]");
-  const board = boards.find((b) => b.boardId === parseInt(boardId));
-
-  // Timer state (shared between tabs)
+  // Timer state
   let timeLeft = 25 * 60;
   let timerInterval = null;
   let isTimerRunning = false;
 
-  // Initialize columns based on methodology
-  if (columns.length === 0) {
-    if (methodology.toLowerCase() !== "none") {
-      columns = [
-        {
-          id: generateId("column"),
-          name: "To Do",
-          board_id: boardId,
-          order_number: 1,
-        },
-        {
-          id: generateId("column"),
-          name: "In Progress",
-          board_id: boardId,
-          order_number: 2,
-        },
-        {
-          id: generateId("column"),
-          name: "Done",
-          board_id: boardId,
-          order_number: 3,
-        },
-      ];
-      localStorage.setItem(`board-${boardId}-columns`, JSON.stringify(columns));
-    }
-  }
-
-  // Initialize board data
-  if (boardId) {
-    if (boardTitle) boardTitle.textContent = title;
-    if (boardDescription) boardDescription.textContent = description;
-    if (boardCategory) boardCategory.textContent = `Категория: ${category}`;
-    if (boardMethodology)
-      boardMethodology.textContent = `Методология: ${methodology}`;
-    if (boardProgress) boardProgress.textContent = `Прогресс: ${progress}`;
-    if (boardLastEdited)
-      boardLastEdited.textContent = `Последнее изменение: ${lastEdited}`;
-  }
-
-  // Initialize favorite button state for the board
-  if (board && favoriteButton) {
-    const starIcon = favoriteButton.querySelector("i");
-    if (starIcon) {
-      starIcon.setAttribute("data-lucide", "star");
-      starIcon.classList.toggle("favorite-active", board.isFavorite);
-      lucide.createIcons({ container: favoriteButton });
-
-      favoriteButton.addEventListener("click", () => {
-        board.isFavorite = !board.isFavorite;
-        localStorage.setItem("boards", JSON.stringify(boards));
-        starIcon.classList.toggle("favorite-active", board.isFavorite);
-        lucide.createIcons({ container: favoriteButton });
-      });
-    }
-  }
-
-  // Simulated API Endpoints using localStorage
-  const simulatePostColumn = (boardId, name) => {
-    const newColumn = {
-      id: generateId("column"),
-      name: sanitizeInput(name),
-      board_id: boardId,
-      order_number: columns.length + 1,
-    };
-    columns.push(newColumn);
-    localStorage.setItem(`board-${boardId}-columns`, JSON.stringify(columns));
-    return newColumn;
+  // API Endpoints
+  const postColumn = async (boardId, name) => {
+    const response = await fetch(`${API_BASE_URL}/boards/${boardId}/columns`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ name }),
+    });
+    return await handleResponse(response);
   };
 
-  const simulatePatchColumn = (columnId, name) => {
-    const columnIndex = columns.findIndex((col) => col.id === columnId);
-    if (columnIndex !== -1) {
-      if (name) columns[columnIndex].name = sanitizeInput(name);
-      localStorage.setItem(`board-${boardId}-columns`, JSON.stringify(columns));
-      return columns[columnIndex];
-    }
-    throw new Error("Column not found");
+  const patchColumn = async (columnId, name) => {
+    const response = await fetch(`${API_BASE_URL}/columns/${columnId}`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ name }),
+    });
+    return await handleResponse(response);
   };
 
-  const simulateDeleteColumn = (columnId) => {
-    columns = columns.filter((col) => col.id !== columnId);
-    tasks = tasks.filter((task) => task.column_id !== columnId);
-    localStorage.setItem(`board-${boardId}-columns`, JSON.stringify(columns));
-    localStorage.setItem(`board-${boardId}-tasks`, JSON.stringify(tasks));
-    return {};
+  const deleteColumn = async (columnId) => {
+    const response = await fetch(`${API_BASE_URL}/columns/${columnId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+    return await handleResponse(response);
   };
 
-  const simulatePostTask = (columnId, taskData) => {
-    const newTask = {
-      id: generateId("task"),
-      name: sanitizeInput(taskData.name),
-      description: sanitizeInput(taskData.description || ""),
-      deadline: taskData.deadline,
-      in_calendar: taskData.in_calendar || false,
-      column_id: columnId,
-      isCompleted: taskData.isCompleted || false,
-    };
-    tasks.push(newTask);
-    localStorage.setItem(`board-${boardId}-tasks`, JSON.stringify(tasks));
-    return newTask;
+  const postTask = async (columnId, taskData) => {
+    const response = await fetch(`${API_BASE_URL}/columns/${columnId}/tasks`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        name: taskData.name,
+        description: taskData.description || "",
+        deadline: taskData.deadline,
+        in_calendar: taskData.in_calendar || false,
+      }),
+    });
+    return await handleResponse(response);
   };
 
-  const simulatePatchTask = (taskId, taskData) => {
-    const taskIndex = tasks.findIndex((task) => task.id === taskId);
-    if (taskIndex !== -1) {
-      if (taskData.name) tasks[taskIndex].name = sanitizeInput(taskData.name);
-      if (taskData.description)
-        tasks[taskIndex].description = sanitizeInput(taskData.description);
-      if (taskData.deadline) tasks[taskIndex].deadline = taskData.deadline;
-      if (typeof taskData.in_calendar === "boolean")
-        tasks[taskIndex].in_calendar = taskData.in_calendar;
-      if (typeof taskData.isCompleted === "boolean")
-        tasks[taskIndex].isCompleted = taskData.isCompleted;
-      localStorage.setItem(`board-${boardId}-tasks`, JSON.stringify(tasks));
-      return tasks[taskIndex];
-    }
-    throw new Error("Task not found");
+  const patchTask = async (taskId, taskData) => {
+    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        name: taskData.name,
+        description: taskData.description,
+        deadline: taskData.deadline,
+        in_calendar: taskData.in_calendar,
+        isCompleted: taskData.isCompleted,
+      }),
+    });
+    return await handleResponse(response);
   };
 
-  const simulateMoveTask = (taskId, newColumnId) => {
-    const taskIndex = tasks.findIndex((task) => task.id === taskId);
-    if (taskIndex !== -1 && columns.some((col) => col.id === newColumnId)) {
-      tasks[taskIndex].column_id = newColumnId;
-      localStorage.setItem(`board-${boardId}-tasks`, JSON.stringify(tasks));
-      return { task_id: taskId, new_column_id: newColumnId };
-    }
-    throw new Error("Task or column not found");
+  const moveTask = async (taskId, newColumnId) => {
+    const response = await fetch(`${API_BASE_URL}/tasks/move/${newColumnId}`, {
+      method: "PATCH",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ task_id: taskId }),
+    });
+    return await handleResponse(response);
   };
 
-  const simulateDeleteTask = (taskId) => {
-    tasks = tasks.filter((task) => task.id !== taskId);
-    localStorage.setItem(`board-${boardId}-tasks`, JSON.stringify(tasks));
-    return {};
+  const deleteTask = async (taskId) => {
+    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
+      method: "DELETE",
+      headers: getAuthHeaders(),
+    });
+    return await handleResponse(response);
   };
 
-  const simulatePostResource = (resourceData) => {
+  const postResource = (resourceData) => {
     const newResource = {
       id: generateId("resource"),
       name: sanitizeInput(resourceData.name),
@@ -331,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return newResource;
   };
 
-  const simulateDeleteResource = (resourceId) => {
+  const deleteResource = (resourceId) => {
     resources = resources.filter((resource) => resource.id !== resourceId);
     localStorage.setItem(
       `board-${boardId}-resources`,
@@ -341,26 +292,25 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Save board progress and sync with dashboard
-  const saveData = () => {
-    const totalTasks = tasks.length;
-    let completedTasks = 0;
-    if (methodology.toLowerCase() === "none") {
-      completedTasks = tasks.filter((task) => task.isCompleted).length;
-    } else {
-      completedTasks = tasks.filter((task) => {
-        const column = columns.find((col) => col.id === task.column_id);
-        return column && column.name.toLowerCase() === "done";
-      }).length;
+  const saveData = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
+        method: "GET",
+        headers: getAuthHeaders(),
+      });
+      const data = await handleResponse(response);
+      const board = data.board;
+      tasks = board.columns.flatMap((col) => col.tasks || []) || [];
+      columns = board.columns || [];
+      progress = `${board.progress}%`;
+      if (boardProgress) boardProgress.textContent = `Прогресс: ${progress}`;
+      renderTasks();
+      renderScrumColumns();
+      renderResources();
+    } catch (e) {
+      console.error("Error saving data:", e);
+      alert("Ошибка при синхронизации данных!");
     }
-    progress =
-      totalTasks > 0
-        ? `${Math.round((completedTasks / totalTasks) * 100)}%`
-        : "0%";
-    if (boardProgress) boardProgress.textContent = `Прогресс: ${progress}`;
-    syncWithDashboard();
-    renderTasks();
-    renderScrumColumns();
-    renderResources();
   };
 
   // Render tasks in the "Tasks" tab
@@ -371,10 +321,17 @@ document.addEventListener("DOMContentLoaded", () => {
         const column = columns.find((col) => col.id === task.column_id);
         const taskItem = document.createElement("div");
         taskItem.classList.add("task-item");
+        const formattedDeadline = task.deadline
+          ? new Date(task.deadline).toLocaleString("ru-RU", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          : "";
         taskItem.innerHTML = `
           <div class="task-content">
             <span class="task-text">${sanitizeInput(task.name)}</span>
-            <span class="task-date">${sanitizeInput(task.deadline)}</span>
+            <span class="task-date">${sanitizeInput(formattedDeadline)}</span>
             <span class="task-column">[${
               column ? sanitizeInput(column.name) : "Без колонки"
             }]</span>
@@ -413,19 +370,19 @@ document.addEventListener("DOMContentLoaded", () => {
               taskModalOverlay.style.display = "block";
               modalTaskText.focus();
               if (saveTaskBtn) {
-                saveTaskBtn.onclick = () => {
+                saveTaskBtn.onclick = async () => {
                   const newName = modalTaskText.value.trim();
                   const newDescription = modalTaskDescription.value.trim();
                   const newDeadline = modalTaskDeadline.value;
                   const newInCalendar = modalTaskInCalendar.checked;
                   if (newName && newDeadline) {
-                    simulatePatchTask(task.id, {
+                    await patchTask(task.id, {
                       name: newName,
                       description: newDescription,
                       deadline: newDeadline,
                       in_calendar: newInCalendar,
                     });
-                    saveData();
+                    await saveData();
                     taskModal.style.display = "none";
                     taskModalOverlay.style.display = "none";
                   } else if (newName.length > 200) {
@@ -443,7 +400,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const deleteBtn = taskItem.querySelector(".delete-task-btn");
         if (deleteBtn) {
-          deleteBtn.addEventListener("click", () => {
+          deleteBtn.addEventListener("click", async () => {
             if (
               confirm(
                 `Вы уверены, что хотите удалить задачу "${sanitizeInput(
@@ -451,8 +408,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 )}"?`
               )
             ) {
-              simulateDeleteTask(task.id);
-              saveData();
+              await deleteTask(task.id);
+              await saveData();
             }
           });
         }
@@ -512,10 +469,19 @@ document.addEventListener("DOMContentLoaded", () => {
               taskItem.classList.add("task-item");
               taskItem.draggable = true;
               taskItem.dataset.taskId = task.id;
+              const formattedDeadline = task.deadline
+                ? new Date(task.deadline).toLocaleString("ru-RU", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })
+                : "";
               let taskContent = `
               <div class="task-content">
                 <span class="task-text">${sanitizeInput(task.name)}</span>
-                <span class="task-date">${sanitizeInput(task.deadline)}</span>
+                <span class="task-date">${sanitizeInput(
+                  formattedDeadline
+                )}</span>
               </div>
               <button class="edit-task-btn" data-task-id="${
                 task.id
@@ -547,7 +513,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     task.id
                   }" ${task.isCompleted ? "checked" : ""}>
                   <span class="task-text">${sanitizeInput(task.name)}</span>
-                  <span class="task-date">${sanitizeInput(task.deadline)}</span>
+                  <span class="task-date">${sanitizeInput(
+                    formattedDeadline
+                  )}</span>
                 </div>
                 <button class="edit-task-btn" data-task-id="${
                   task.id
@@ -591,20 +559,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     taskModalOverlay.style.display = "block";
                     modalTaskText.focus();
                     if (saveTaskBtn) {
-                      saveTaskBtn.onclick = () => {
+                      saveTaskBtn.onclick = async () => {
                         const newName = modalTaskText.value.trim();
                         const newDescription =
                           modalTaskDescription.value.trim();
                         const newDeadline = modalTaskDeadline.value;
                         const newInCalendar = modalTaskInCalendar.checked;
                         if (newName && newDeadline) {
-                          simulatePatchTask(task.id, {
+                          await patchTask(task.id, {
                             name: newName,
                             description: newDescription,
                             deadline: newDeadline,
                             in_calendar: newInCalendar,
                           });
-                          saveData();
+                          await saveData();
                           taskModal.style.display = "none";
                           taskModalOverlay.style.display = "none";
                         } else if (newName.length > 200) {
@@ -624,7 +592,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
               const deleteBtn = taskItem.querySelector(".delete-task-btn");
               if (deleteBtn) {
-                deleteBtn.addEventListener("click", () => {
+                deleteBtn.addEventListener("click", async () => {
                   if (
                     confirm(
                       `Вы уверены, что хотите удалить задачу "${sanitizeInput(
@@ -632,8 +600,8 @@ document.addEventListener("DOMContentLoaded", () => {
                       )}"?`
                     )
                   ) {
-                    simulateDeleteTask(task.id);
-                    saveData();
+                    await deleteTask(task.id);
+                    await saveData();
                   }
                 });
               }
@@ -641,19 +609,19 @@ document.addEventListener("DOMContentLoaded", () => {
               if (methodology.toLowerCase() === "none") {
                 const checkbox = taskItem.querySelector(".task-checkbox");
                 if (checkbox) {
-                  checkbox.addEventListener("change", () => {
-                    simulatePatchTask(task.id, {
+                  checkbox.addEventListener("change", async () => {
+                    await patchTask(task.id, {
                       isCompleted: checkbox.checked,
                     });
-                    saveData();
+                    await saveData();
                   });
                 }
               } else {
                 const statusSelect = taskItem.querySelector(".status-select");
                 if (statusSelect) {
-                  statusSelect.addEventListener("change", () => {
-                    simulateMoveTask(task.id, statusSelect.value);
-                    saveData();
+                  statusSelect.addEventListener("change", async () => {
+                    await moveTask(task.id, statusSelect.value);
+                    await saveData();
                   });
                 }
               }
@@ -663,11 +631,11 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
           });
 
-          columnDiv.addEventListener("drop", (e) => {
+          columnDiv.addEventListener("drop", async (e) => {
             e.preventDefault();
             const taskId = e.dataTransfer.getData("text/plain");
-            simulateMoveTask(taskId, column.id);
-            saveData();
+            await moveTask(taskId, column.id);
+            await saveData();
           });
 
           const addTaskButton = columnDiv.querySelector(".add-task");
@@ -689,19 +657,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 taskModalOverlay.style.display = "block";
                 modalTaskText.focus();
                 if (saveTaskBtn) {
-                  saveTaskBtn.onclick = () => {
+                  saveTaskBtn.onclick = async () => {
                     const taskText = modalTaskText.value.trim();
                     const taskDescription = modalTaskDescription.value.trim();
                     const taskDeadline = modalTaskDeadline.value;
                     const taskInCalendar = modalTaskInCalendar.checked;
                     if (taskText && taskDeadline) {
-                      simulatePostTask(column.id, {
+                      await postTask(column.id, {
                         name: taskText,
                         description: taskDescription,
                         deadline: taskDeadline,
                         in_calendar: taskInCalendar,
                       });
-                      saveData();
+                      await saveData();
                       taskModal.style.display = "none";
                       taskModalOverlay.style.display = "none";
                     } else if (taskText.length > 200) {
@@ -728,11 +696,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 columnModalOverlay.style.display = "block";
                 modalColumnName.focus();
                 if (saveColumnBtn) {
-                  saveColumnBtn.onclick = () => {
+                  saveColumnBtn.onclick = async () => {
                     const newName = modalColumnName.value.trim();
                     if (newName) {
-                      simulatePatchColumn(column.id, newName);
-                      saveData();
+                      await patchColumn(column.id, newName);
+                      await saveData();
                       columnModal.style.display = "none";
                       columnModalOverlay.style.display = "none";
                     } else {
@@ -746,7 +714,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const deleteColumnBtn = columnDiv.querySelector(".delete-column-btn");
           if (deleteColumnBtn) {
-            deleteColumnBtn.addEventListener("click", () => {
+            deleteColumnBtn.addEventListener("click", async () => {
               if (
                 confirm(
                   `Вы уверены, что хотите удалить колонку "${sanitizeInput(
@@ -754,8 +722,8 @@ document.addEventListener("DOMContentLoaded", () => {
                   )}"? Все задачи в этой колонке будут удалены.`
                 )
               ) {
-                simulateDeleteColumn(column.id);
-                saveData();
+                await deleteColumn(column.id);
+                await saveData();
               }
             });
           }
@@ -798,7 +766,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   )}"?`
                 )
               ) {
-                simulateDeleteResource(resource.id);
+                deleteResource(resource.id);
                 saveData();
               }
             });
@@ -873,21 +841,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const syncWithDashboard = () => {
-    const boardData = {
-      boardId,
-      title,
-      description,
-      category,
-      methodology,
-      progress,
-      lastEdited,
-    };
-    localStorage.setItem(`board-${boardId}`, JSON.stringify(boardData));
-  };
-
   if (saveBoardBtn) {
-    saveBoardBtn.addEventListener("click", () => {
+    saveBoardBtn.addEventListener("click", async () => {
       if (modalBoardTitle && modalBoardDescription) {
         const newTitle = modalBoardTitle.value.trim() || title;
         const newDescription =
@@ -901,37 +856,37 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        const currentDate = new Date().toLocaleString("ru-RU", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        });
+        try {
+          const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
+            method: "PATCH",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+              name: newTitle,
+              description: newDescription,
+            }),
+          });
+          const data = await handleResponse(response);
+          const board = data.board;
+          title = sanitizeInput(board.name);
+          description = sanitizeInput(board.description);
+          lastEdited = new Date(board.updated_at).toLocaleString("ru-RU", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          });
 
-        title = sanitizeInput(newTitle);
-        description = sanitizeInput(newDescription);
-        lastEdited = currentDate;
+          if (boardTitle) boardTitle.textContent = title;
+          if (boardDescription) boardDescription.textContent = description;
+          if (boardLastEdited)
+            boardLastEdited.textContent = `Последнее изменение: ${lastEdited}`;
 
-        if (boardTitle) boardTitle.textContent = title;
-        if (boardDescription) boardDescription.textContent = description;
-        if (boardLastEdited)
-          boardLastEdited.textContent = `Последнее изменение: ${lastEdited}`;
-
-        const params = new URLSearchParams({
-          boardId,
-          title: encodeURIComponent(title),
-          description: encodeURIComponent(description),
-          category: encodeURIComponent(category),
-          methodology: encodeURIComponent(methodology),
-          progress: encodeURIComponent(progress),
-          lastEdited: encodeURIComponent(lastEdited),
-        });
-        window.history.replaceState({}, "", `?${params.toString()}`);
-
-        syncWithDashboard();
-
-        if (boardModal && boardModalOverlay) {
-          boardModal.style.display = "none";
-          boardModalOverlay.style.display = "none";
+          if (boardModal && boardModalOverlay) {
+            boardModal.style.display = "none";
+            boardModalOverlay.style.display = "none";
+          }
+        } catch (e) {
+          console.error("Error updating board:", e);
+          alert("Ошибка при обновлении доски!");
         }
       }
     });
@@ -976,7 +931,7 @@ document.addEventListener("DOMContentLoaded", () => {
         taskModalOverlay.style.display = "block";
         modalTaskText.focus();
         if (saveTaskBtn) {
-          saveTaskBtn.onclick = () => {
+          saveTaskBtn.onclick = async () => {
             const taskText = modalTaskText.value.trim();
             const taskDescription = modalTaskDescription.value.trim();
             const taskDeadline = modalTaskDeadline.value;
@@ -986,13 +941,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 columns.find((col) => col.name.toLowerCase() === "to do") ||
                 columns[0];
               if (defaultColumn) {
-                simulatePostTask(defaultColumn.id, {
+                await postTask(defaultColumn.id, {
                   name: taskText,
                   description: taskDescription,
                   deadline: taskDeadline,
                   in_calendar: taskInCalendar,
                 });
-                saveData();
+                await saveData();
                 taskModal.style.display = "none";
                 taskModalOverlay.style.display = "none";
               } else {
@@ -1038,11 +993,11 @@ document.addEventListener("DOMContentLoaded", () => {
         columnModalOverlay.style.display = "block";
         modalColumnName.focus();
         if (saveColumnBtn) {
-          saveColumnBtn.onclick = () => {
+          saveColumnBtn.onclick = async () => {
             const columnName = modalColumnName.value.trim();
             if (columnName) {
-              simulatePostColumn(boardId, columnName);
-              saveData();
+              await postColumn(boardId, columnName);
+              await saveData();
               columnModal.style.display = "none";
               columnModalOverlay.style.display = "none";
             } else {
@@ -1082,7 +1037,7 @@ document.addEventListener("DOMContentLoaded", () => {
           saveResourceBtn.onclick = () => {
             const resourceName = modalResourceName.value.trim();
             if (resourceName) {
-              simulatePostResource({ name: resourceName });
+              postResource({ name: resourceName });
               saveData();
               resourceModal.style.display = "none";
               resourceModalOverlay.style.display = "none";
@@ -1111,7 +1066,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Timer functionality (shared for "Tasks" and "Resources" tabs)
+  // Timer functionality
   const updateDisplay = () => {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -1202,7 +1157,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Timer controls for "Resources" tab
   if (startButtonResources) {
     startButtonResources.addEventListener("click", startTimer);
   }
@@ -1257,9 +1211,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // Initialize favorite button state for the board
+  if (favoriteButton) {
+    favoriteButton.addEventListener("click", async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
+          method: "PATCH",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ favorite: !favorite }),
+        });
+        const data = await handleResponse(response);
+        favorite = data.board.favorite;
+        const starIcon = favoriteButton.querySelector("i");
+        if (starIcon) {
+          starIcon.setAttribute("data-lucide", "star");
+          starIcon.classList.toggle("favorite-active", favorite);
+          lucide.createIcons({ container: favoriteButton });
+        }
+      } catch (e) {
+        console.error("Error updating favorite status:", e);
+        alert("Ошибка при обновлении статуса избранного!");
+      }
+    });
+  }
+
   // Initial render
-  renderScrumColumns();
-  renderTasks();
-  renderResources();
-  updateDisplay();
+  initializeBoardData().then(() => {
+    renderScrumColumns();
+    renderTasks();
+    renderResources();
+    updateDisplay();
+  });
 });
