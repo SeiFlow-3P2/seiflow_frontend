@@ -1,87 +1,112 @@
+
 document.addEventListener("DOMContentLoaded", async () => {
+  const syncButton = document.getElementById("sync-button");
+  const lastSyncTimeElement = document.getElementById("last-sync-time");
   const boardsGrid = document.getElementById("boardsGrid");
-  const API_BASE_URL = "http://localhost:8080/v1";
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("authToken") || "mock-token";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-  };
+  let lastSyncTime = localStorage.getItem(config.storage.lastSyncTime) || null;
 
-  const handleResponse = async (response) => {
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`HTTP error ${response.status}: ${error}`);
+  const updateLastSyncTime = () => {
+    const now = new Date();
+    lastSyncTime = now.toISOString();
+    localStorage.setItem(config.storage.lastSyncTime, lastSyncTime);
+    if (lastSyncTimeElement) {
+      lastSyncTimeElement.textContent = `Последняя синхронизация: ${now.toLocaleString("ru-RU", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`;
     }
-    if (response.status === 204) return {};
-    return response.json();
   };
 
-  async function syncBoards() {
+  const syncBoardsData = async () => {
+    if (!boardsGrid) return;
+
     try {
-      const response = await fetch(`${API_BASE_URL}/boards`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      const data = await handleResponse(response);
-      const boards = data.boards || [];
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.boards.list}`,
+        {
+          method: "GET",
+          headers: config.utils.getAuthHeaders(),
+        }
+      );
+      const data = await config.utils.handleResponse(response);
+      const boards = data.boards;
 
-      boardsGrid.innerHTML = `
-        <div class="board-card new-board-card" id="new-board-card">
-          <div class="new-board-content">
-            <i data-lucide="plus" class="icon-plus"></i>
-            <span>Создать новую доску</span>
-          </div>
-        </div>
-      `;
-
+      boardsGrid.innerHTML = "";
       boards.forEach((board) => {
-        const card = document.createElement("div");
-        card.className = "board-card";
-        card.dataset.boardId = board.id;
-        card.dataset.category = board.category;
-        card.innerHTML = `
-          <div class="board-content">
-            <div class="board-header">
-              <h3 class="board-title">${sanitizeInput(board.name)}</h3>
-              <div class="board-actions">
-                <button class="board-favorite-button" aria-label="Добавить в избранное">
-                  <i data-lucide="star" class="${
-                    board.favorite ? "favorite-active" : ""
-                  }"></i>
-                </button>
-                <button class="board-action-button" aria-label="Дополнительные действия">
-                  <i data-lucide="more-horizontal"></i>
-                </button>
-                <div class="more-options-menu" style="display: none;">
-                  <button class="delete-board">Удалить</button>
-                </div>
+        const boardCard = document.createElement("div");
+        boardCard.classList.add("board-card");
+        boardCard.dataset.boardId = board.id;
+        boardCard.innerHTML = `
+          <div class="board-card-header">
+            <h3 class="board-title">${config.utils.sanitizeInput(board.name)}</h3>
+            <button class="board-favorite-button" aria-label="${
+              board.favorite ? "Удалить из избранного" : "Добавить в избранное"
+            }">
+              <i data-lucide="star" class="${board.favorite ? "favorite-active" : ""}"></i>
+            </button>
+            <button class="board-action-button" aria-label="Дополнительные действия">
+              <i data-lucide="more-horizontal"></i>
+            </button>
+            <div class="more-options-menu" style="display: none;">
+              <button class="delete-board" data-board-id="${board.id}" aria-label="Удалить доску '${config.utils.sanitizeInput(board.name)}'">
+                Удалить
+              </button>
+            </div>
+          </div>
+          <p class="board-description">${config.utils.sanitizeInput(board.description)}</p>
+          <div class="board-info">
+            <div class="progress-info">
+              <span>${board.progress}%</span>
+              <div class="progress-bar">
+                <div class="progress" style="width: ${board.progress}%"></div>
               </div>
             </div>
-            <p class="board-description">${sanitizeInput(board.description)}</p>
-            <p class="board-methodology">Методология: ${sanitizeInput(
-              board.methodology
+            <p class="board-methodology">Методология: ${config.utils.sanitizeInput(board.methodology)}</p>
+            <p class="board-last-edited">Последнее редактирование: ${config.utils.sanitizeInput(
+              new Date(board.updated_at).toLocaleString("ru-RU", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })
             )}</p>
-            <div class="progress-info">
-              <span>Прогресс: ${board.progress}%</span>
-            </div>
-            <p class="board-last-edited">Последнее редактирование: ${new Date(
-              board.updated_at
-            ).toLocaleDateString("ru-RU")}</p>
           </div>
         `;
-        boardsGrid.insertBefore(card, boardsGrid.firstChild);
+        boardsGrid.appendChild(boardCard);
       });
 
-      lucide.createIcons();
-      if (window.updateBoardCards) window.updateBoardCards();
-    } catch (error) {
-      console.error("Ошибка при загрузке досок:", error.message);
-      boardsGrid.innerHTML = "<p>Ошибка загрузки досок. Попробуйте позже.</p>";
+      config.ui.lucide.initialize({ container: boardsGrid });
+      updateLastSyncTime();
+    } catch (e) {
+      console.error("Ошибка синхронизации:", e);
+      alert("Ошибка при синхронизации данных!");
     }
+  };
+
+  if (lastSyncTime && lastSyncTimeElement) {
+    lastSyncTimeElement.textContent = `Последняя синхронизация: ${new Date(lastSyncTime).toLocaleString("ru-RU", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    })}`;
   }
 
-  await syncBoards();
+  if (syncButton) {
+    syncButton.addEventListener("click", async () => {
+      syncButton.disabled = true;
+      try {
+        await syncBoardsData();
+      } finally {
+        syncButton.disabled = false;
+      }
+    });
+  }
+
+  // Initial sync
+  await syncBoardsData();
 });
