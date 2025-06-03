@@ -7,6 +7,7 @@
   <title>Dashboard</title>
   <link rel="stylesheet" href="./styles/dashboard-page.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="./styles/profile-modal.css">
 </head>
 
 <body>
@@ -31,7 +32,7 @@
               <i data-lucide="chevron-down" aria-hidden="true"></i>
             </button>
             <div class="dropdown-menu">
-              <a href="#" class="dropdown-item">
+              <a href="#" class="dropdown-item" id="profile">
                 <i data-lucide="user" class="dropdown-icon" aria-hidden="true"></i>
                 Профиль
               </a>
@@ -250,6 +251,72 @@
       </div>
     </footer>
   </div>
+  <div class="modal-overlay hidden" id="profileModal">
+    <div class="profile-container">
+      <div class="profile-header">
+        <div class="avatar-container">
+          <div class="avatar">
+            <img id="avatarImage" src="" alt="Аватар" style="display: none;">
+            <i id="avatarIcon" data-lucide="user" class="avatar-icon"></i>
+          </div>
+          <button id="avatarActionButton" class="avatar-action-button">
+            <i id="actionIcon" data-lucide="plus"></i>
+          </button>
+          <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        </div>
+        <div class="header-buttons">
+          <button class="settings-button">
+            <i data-lucide="settings"></i>
+          </button>
+          <button class="logout-button">
+            <i data-lucide="log-out"></i>
+          </button>
+        </div>
+      </div>
+      <div class="profile-info" style="display: block;" class="view-mode">
+        <h2 class="user-name">Александр Петров</h2>
+        <p class="user-bio">Разработчик программного обеспечения</p>
+        <div class="user-details">
+          <div class="detail-item">
+            <i data-lucide="mail" class="detail-icon"></i>
+            <span class="detail-text">[email protected]</span>
+          </div>
+          <div class="detail-item">
+            <i data-lucide="map-pin" class="detail-icon"></i>
+            <span class="detail-text">Москва, Россия</span>
+          </div>
+        </div>
+        <div class="stats-container">
+          <div class="stat-item">
+            <span class="stat-number">12</span>
+            <span class="stat-label">Проектов</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">3.4K</span>
+            <span class="stat-label">Подписчиков</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">257</span>
+            <span class="stat-label">Подписок</span>
+          </div>
+        </div>
+      </div>
+      <div class="edit-form" style="display: none;">
+        <div>
+          <label for="nameInput" class="input-label">Имя</label>
+          <input type="text" id="nameInput" class="input-field" value="Александр Петров">
+        </div>
+        <div>
+          <label for="bioInput" class="input-label">О себе</label>
+          <textarea id="bioInput" class="textarea-field">Разработчик программного обеспечения</textarea>
+        </div>
+        <div class="form-buttons">
+          <button class="cancel-button">Отмена</button>
+          <button class="save-button">Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       // Восстанавливаем состояние фильтров
@@ -323,6 +390,7 @@
   <script src="./scripts/boardNavigation.js"></script>
   <script src="./scripts/syncDashboard.js"></script>
   <script src="./scripts/utils.js"></script>
+  <script src="./scripts/profile-modal.js"></script>
 </body>
 
 </html>
