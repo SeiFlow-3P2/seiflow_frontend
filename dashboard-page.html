@@ -39,9 +39,9 @@
                 <i data-lucide="moon" class="dropdown-icon" id="theme-icon" aria-hidden="true"></i>
                 Тема
               </a>
-              <a href="#" class="dropdown-item">
+              <a href="#" class="dropdown-item" id="logout-button">
                 <i data-lucide="log-out" class="dropdown-icon" aria-hidden="true"></i>
-                Выйти
+                Выйти          
               </a>
             </div>
           </div>
@@ -52,15 +52,15 @@
     <div class="dashboard-content">
       <aside class="desktop-sidebar">
         <nav class="sidebar-nav">
-          <a href="#" class="sidebar-link ">
+          <a href="/index.html" class="sidebar-link ">
             <i data-lucide="home" class="sidebar-icon" aria-hidden="true"></i>
             Главная
           </a>
-          <a href="#" class="sidebar-link active">
+          <a href="/dashboard-page.html" class="sidebar-link active">
             <i data-lucide="trello" class="sidebar-icon" aria-hidden="true"></i>
             Мои доски
           </a>
-          <a href="#" class="sidebar-link">
+          <a href="/calendar.html" class="sidebar-link">
             <i data-lucide="calendar" class="sidebar-icon" aria-hidden="true"></i>
             Календарь
           </a>
@@ -252,14 +252,68 @@
   </div>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // Восстанавливаем состояние фильтров
       if (window.utils && window.utils.restoreFilterState) {
         const activeCategory = window.utils.restoreFilterState();
+
+        // Обновляем видимость карточек
         if (window.updateBoardVisibility) {
           window.updateBoardVisibility();
         }
       }
     });
   </script>
+<script type="module">
+  import { logout } from "./scripts/auth.js"; // Уточнён путь
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("Скрипт dashboard-page загружен");
+    const profileModal = document.getElementById("profile-modal");
+    try {
+      if (window.utils && window.utils.restoreFilterState) {
+        console.log("Восстановление фильтров...");
+        const activeCategory = window.utils.restoreFilterState();
+        if (window.updateBoardVisibility) {
+          window.updateBoardVisibility();
+        }
+      }
+      const profileButton = document.querySelector(".dropdown-item[href='#profile']");
+      if (profileButton) {
+        console.log("Кнопка Профиль найдена");
+        profileButton.addEventListener("click", (e) => {
+          e.preventDefault();
+          console.log("Нажата кнопка Профиль");
+          profileModal.style.display = "flex";
+          profileModalOverlay.style.display = "block";
+          profileModal.querySelector(".user-name").focus();
+        });
+      } else {
+        console.error("Кнопка Профиль не найдена");
+      }
+      const logoutButton = document.getElementById("logout-button");
+      if (logoutButton) {
+        console.log("Кнопка Выйти найдена");
+        logoutButton.addEventListener("click", async (e) => {
+          e.preventDefault();
+          console.log("Нажата кнопка Выйти");
+          try {
+            await logout();
+          } catch (err) {
+            console.error("Ошибка при выходе:", err.message);
+            // Принудительный переход на index.html
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("refreshToken");
+            window.location.href = "index.html";
+          }
+        });
+      } else {
+        console.error("Кнопка logout-button не найдена");
+      }
+      lucide.createIcons();
+    } catch (err) {
+      console.error("Ошибка в скрипте dashboard-page:", err.message);
+    }
+  });
+</script>
   <script src="./scripts/menu.js"></script>
   <script src="./scripts/theme-switcher.js"></script>
   <script src="./scripts/view-mode.js"></script>
