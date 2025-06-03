@@ -4,26 +4,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SeiFlow - Dashboard</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="./styles/dashboard-page.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script src="./scripts/menu.js" defer></script> 
-  <script src="./scripts/modal.js" defer></script>
-  <script src="./scripts/view-mode.js" defer></script>
-  <script src="./scripts/filters.js" defer></script>
 </head>
 
 <body>
   <div class="dashboard-container">
-    <!-- Header -->
     <header class="dashboard-header">
       <div class="header-content">
         <div class="header-left">
-          <button class="mobile-menu-button" aria-label="Открыть мобильное меню">
-            <i data-lucide="menu" class="menu-icon" aria-hidden="true"></i>
+          <button class="mobile-menu-button" aria-label="Открыть меню">
+            <i data-lucide="menu" aria-hidden="true"></i>
           </button>
-          <span class="logo">SeiFlow</span>
-
+          <div class="logo">SeiFlow</div>
         </div>
         <div class="header-right">
           <button class="notification-button" aria-label="Уведомления">
@@ -31,25 +25,23 @@
             <span class="notification-badge"></span>
           </button>
           <div class="user-dropdown">
-            <button class="user-button" aria-haspopup="true" aria-label="Меню пользователя">
-              <div class="user-avatar">
-                <i data-lucide="user" aria-hidden="true"></i>
-              </div>
+            <button class="user-button" aria-label="Открыть меню пользователя">
+              <div class="user-avatar">А</div>
               <span class="user-name">Александр</span>
-              <i data-lucide="chevron-down" class="dropdown-arrow" aria-hidden="true"></i>
+              <i data-lucide="chevron-down" aria-hidden="true"></i>
             </button>
             <div class="dropdown-menu">
               <a href="#" class="dropdown-item">
                 <i data-lucide="user" class="dropdown-icon" aria-hidden="true"></i>
-                <span>Профиль</span>
+                Профиль
               </a>
-              <a href="#" class="dropdown-item">
-                <i data-lucide="settings" class="dropdown-icon" aria-hidden="true"></i>
-                <span>Настройки</span>
+              <a href="#" class="dropdown-item" id="theme-toggle">
+                <i data-lucide="moon" class="dropdown-icon" id="theme-icon" aria-hidden="true"></i>
+                Тема
               </a>
               <a href="#" class="dropdown-item">
                 <i data-lucide="log-out" class="dropdown-icon" aria-hidden="true"></i>
-                <span>Выйти</span>
+                Выйти
               </a>
             </div>
           </div>
@@ -57,90 +49,83 @@
       </div>
     </header>
 
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu-overlay"></div>
-
-    <!-- Dashboard Content -->
     <div class="dashboard-content">
-      <!-- Sidebar - Mobile -->
-      <aside class="mobile-sidebar">
-        <nav class="sidebar-nav">
-          <a href="#" class="sidebar-link">
-            <i data-lucide="home" aria-hidden="true"></i>
-            <span> Главная</span>
-          </a>
-          <a href="#" class="sidebar-link active">
-            <i data-lucide="layers" aria-hidden="true"></i>
-            <span> Мои доски</span>
-          </a>
-          <a href="#" class="sidebar-link">
-            <i data-lucide="calendar" aria-hidden="true"></i>
-            <span> Календарь</span>
-          </a>
-          <a href="#" class="sidebar-link">
-            <i data-lucide="music" aria-hidden="true"></i>
-            <span>Контент</span>
-          </a>
-        </nav>
-        <div class="recent-boards">
-          <h3 class="sidebar-section-title">Недавние доски</h3>
-          <div class="board-links">
-            <a href="#" class="board-link">
-              <i data-lucide="book-open" class="board-icon yellow-icon" aria-hidden="true"></i>
-              <span>Изучение испанского</span>
-            </a>
-            <a href="#" class="board-link">
-              <i data-lucide="heart" class="board-icon red-icon" aria-hidden="true"></i>
-              <span>Фитнес-челлендж</span>
-            </a>
-            <a href="#" class="board-link">
-              <i data-lucide="bar-chart-2" class="board-icon green-icon" aria-hidden="true"></i>
-              <span>Личные финансы</span>
-            </a>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Sidebar - Desktop -->
       <aside class="desktop-sidebar">
         <nav class="sidebar-nav">
-          <a href="#" class="sidebar-link">
+          <a href="#" class="sidebar-link ">
             <i data-lucide="home" class="sidebar-icon" aria-hidden="true"></i>
-            <span>Главная</span>
+            Главная
           </a>
           <a href="#" class="sidebar-link active">
-            <i data-lucide="layers" class="sidebar-icon" aria-hidden="true"></i>
-            <span>Мои доски</span>
+            <i data-lucide="trello" class="sidebar-icon" aria-hidden="true"></i>
+            Мои доски
           </a>
           <a href="#" class="sidebar-link">
             <i data-lucide="calendar" class="sidebar-icon" aria-hidden="true"></i>
-            <span>Календарь</span>
+            Календарь
           </a>
           <a href="#" class="sidebar-link">
-            <i data-lucide="music" class="sidebar-icon" aria-hidden="true"></i>
-            <span>Контент</span>
+            <i data-lucide="file-text" class="sidebar-icon" aria-hidden="true"></i>
+            Контент
           </a>
         </nav>
         <div class="recent-boards">
-          <h3 class="sidebar-section-title">Недавние доски</h3>
+          <div class="sidebar-section-title">Недавние доски</div>
           <div class="board-links">
             <a href="#" class="board-link">
               <i data-lucide="book-open" class="board-icon yellow-icon" aria-hidden="true"></i>
-              <span>Изучение испанского языка</span>
+              Изучение испанского языка
             </a>
             <a href="#" class="board-link">
               <i data-lucide="heart" class="board-icon red-icon" aria-hidden="true"></i>
-              <span>Фитнес-челлендж</span>
+              Фитнес-челлендж
             </a>
             <a href="#" class="board-link">
               <i data-lucide="bar-chart-2" class="board-icon green-icon" aria-hidden="true"></i>
-              <span>Личные финансы</span>
+              Личные финансы
             </a>
           </div>
         </div>
       </aside>
 
-      <!-- Main content -->
+      <aside class="mobile-sidebar">
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-link active">
+            <i data-lucide="home" class="sidebar-icon" aria-hidden="true"></i>
+            Главная
+          </a>
+          <a href="#" class="sidebar-link">
+            <i data-lucide="trello" class="sidebar-icon" aria-hidden="true"></i>
+            Мои доски
+          </a>
+          <a href="#" class="sidebar-link">
+            <i data-lucide="calendar" class="sidebar-icon" aria-hidden="true"></i>
+            Календарь
+          </a>
+          <a href="#" class="sidebar-link">
+            <i data-lucide="file-text" class="sidebar-icon" aria-hidden="true"></i>
+            Контент
+          </a>
+        </nav>
+        <div class="recent-boards">
+          <div class="sidebar-section-title">Недавние доски</div>
+          <div class="board-links">
+            <a href="#" class="board-link">
+              <i data-lucide="book-open" class="board-icon yellow-icon" aria-hidden="true"></i>
+              Изучение испанского языка
+            </a>
+            <a href="#" class="board-link">
+              <i data-lucide="heart" class="board-icon red-icon" aria-hidden="true"></i>
+              Фитнес-челлендж
+            </a>
+            <a href="#" class="board-link">
+              <i data-lucide="bar-chart-2" class="board-icon green-icon" aria-hidden="true"></i>
+              Личные финансы
+            </a>
+          </div>
+        </div>
+      </aside>
+
       <main class="main-content">
         <div class="content-header">
           <div class="header-info">
@@ -149,36 +134,29 @@
           </div>
           <div class="header-actions">
             <div class="view-toggle">
-              <button class="view-button grid-view active" data-view="grid" aria-label="Сеточный вид">
+              <button class="view-button" data-view="grid" aria-label="Вид сеткой">
                 <i data-lucide="grid" aria-hidden="true"></i>
               </button>
-              <button class="view-button list-view" data-view="list" aria-label="Список">
+              <button class="view-button" data-view="list" aria-label="Вид списком">
                 <i data-lucide="list" aria-hidden="true"></i>
               </button>
             </div>
             <button class="new-board-button" id="newBoardButton">
               <i data-lucide="plus" aria-hidden="true"></i>
-              <span>Новая доска</span>
+              Новая доска
             </button>
           </div>
         </div>
 
-        <!-- Category filter -->
-        <div class="category-buttons">
-          <button class="category-button filter-category-button active" aria-label="Фильтр по категории Все доски"
-            aria-pressed="true">Все доски</button>
-          <button class="category-button filter-category-button" aria-label="Фильтр по категории Обучение"
-            aria-pressed="false">Обучение</button>
-          <button class="category-button filter-category-button" aria-label="Фильтр по категории Здоровье"
-            aria-pressed="false">Здоровье</button>
-          <button class="category-button filter-category-button" aria-label="Фильтр по категории Финансы"
-            aria-pressed="false">Финансы</button>
-          <button class="category-button filter-category-button" aria-label="Фильтр по категории Личное"
-            aria-pressed="false">Личное</button>  
+        <div class="category-buttons category-filter">
+          <button class="category-button filter-category-button active" aria-pressed="true">Все доски</button>
+          <button class="category-button filter-category-button">Обучение</button>
+          <button class="category-button filter-category-button">Здоровье</button>
+          <button class="category-button filter-category-button">Финансы</button>
+          <button class="category-button filter-category-button">Личное</button>
         </div>
-        <!-- Boards grid -->
+
         <div class="boards-grid" id="boardsGrid">
-          <!-- Create new board card -->
           <div class="new-board-card" id="newBoardCard">
             <div class="new-board-icon">
               <i data-lucide="plus" aria-hidden="true"></i>
@@ -187,91 +165,110 @@
             <p>Добавьте персонализированную доску для любых целей</p>
           </div>
         </div>
+
       </main>
     </div>
-  </div>
-  <div class="modal" id="newBoardModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Создание новой доски</h2>
-        <button class="modal-close" id="closeModal">×</button>
-      </div>
-      <div class="modal-body">
-        <form id="newBoardForm">
-          <div class="form-group">
-            <label for="boardTitle">Название доски:</label>
-            <input type="text" id="boardTitle" name="boardTitle" required>
-          </div>
-          <div class="form-group">
-            <label for="boardDescription">Описание:</label>
-            <textarea id="boardDescription" name="boardDescription" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Категория:</label>
-            <div class="category-buttons">
-              <input type="hidden" id="boardCategory" name="boardCategory" value="learning">
-              <button type="button" class="modal-category-button active" data-value="learning">Обучение</button>
-              <button type="button" class="modal-category-button" data-value="health">Здоровье</button>
-              <button type="button" class="modal-category-button" data-value="finance">Финансы</button>
-              <button type="button" class="modal-category-button" data-value="personal">Личное</button>
+
+    <div class="modal" id="newBoardModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Создание новой доски</h2>
+          <button class="modal-close" id="closeModal">×</button>
+        </div>
+        <div class="modal-body">
+          <form id="newBoardForm">
+            <div class="form-group">
+              <label for="boardTitle">Название доски:</label>
+              <input type="text" id="boardTitle" name="boardTitle" required>
             </div>
-          </div>
-          <div class="form-group">
-            <label>Методология:</label>
-            <div class="methodology-buttons">
-              <input type="hidden" id="boardMethodology" name="boardMethodology" value="none">
-              <button type="button" class="methodology-button active" data-value="none">Без методологии</button>
-              <button type="button" class="methodology-button" data-value="agile">Agile</button>
-              <button type="button" class="methodology-button" data-value="kanban">Kanban</button>
+            <div class="form-group">
+              <label for="boardDescription">Описание:</label>
+              <textarea id="boardDescription" name="boardDescription"></textarea>
             </div>
-          </div>
-          <div class="modal-actions">
-            <button type="submit" class="modal-submit">Создать</button>
-            <button type="button" class="modal-cancel" id="cancelModal">Отмена</button>
-          </div>
-        </form>
+            <div class="form-group">
+              <label>Категория:</label>
+              <div class="category-buttons">
+                <input type="hidden" id="boardCategory" name="boardCategory" value="learning">
+                <button type="button" class="modal-category-button active" data-value="learning">Обучение</button>
+                <button type="button" class="modal-category-button" data-value="health">Здоровье</button>
+                <button type="button" class="modal-category-button" data-value="finance">Финансы</button>
+                <button type="button" class="modal-category-button" data-value="personal">Личное</button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Методология:</label>
+              <div class="methodology-buttons">
+                <input type="hidden" id="boardMethodology" name="boardMethodology" value="none">
+                <button type="button" class="methodology-button active" data-value="none">Без методологии</button>
+                <button type="button" class="methodology-button" data-value="scrum">Scrum</button>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <button type="submit" class="modal-submit">Создать</button>
+              <button type="button" class="modal-cancel" id="cancelModal">Отмена</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
+
+    <footer class="footer">
+      <div class="footer-container">
+        <div class="footer-grid">
+          <div class="footer-about">
+            <div class="footer-logo">SeiFlow</div>
+            <p class="footer-description">Интеллектуальная платформа для персонализированной организации жизни</p>
+          </div>
+          <div>
+            <h4 class="footer-links-title">Платформа</h4>
+            <ul class="footer-links-list">
+              <li><a href="#" class="footer-link">Возможности</a></li>
+              <li><a href="#" class="footer-link">Сервисы</a></li>
+              <li><a href="#" class="footer-link">Доски</a></li>
+              <li><a href="#" class="footer-link">Интеграции</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="footer-links-title">Компания</h4>
+            <ul class="footer-links-list">
+              <li><a href="#" class="footer-link">О нас</a></li>
+              <li><a href="#" class="footer-link">Блог</a></li>
+              <li><a href="#" class="footer-link">Карьера</a></li>
+              <li><a href="#" class="footer-link">Контакты</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="footer-links-title">Правовая информация</h4>
+            <ul class="footer-links-list">
+              <li><a href="#" class="footer-link">Условия использования</a></li>
+              <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
+              <li><a href="#" class="footer-link">Cookies</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-copyright">© 2025 SeiFlow. Все права защищены.</div>
+      </div>
+    </footer>
   </div>
-  <footer class="footer">
-    <div class="footer-container">
-      <div class="footer-grid">
-        <div class="footer-about">
-          <h3 class="footer-logo">SeiFlow</h3>
-          <p class="footer-description">Интеллектуальная платформа для персонализированной организации жизни</p>
-        </div>
-        <div class="footer-links">
-          <h4 class="footer-links-title">Платформа</h4>
-          <ul class="footer-links-list">
-            <li><a href="#" class="footer-link">Возможности</a></li>
-            <li><a href="#" class="footer-link">Сервисы</a></li>
-            <li><a href="#" class="footer-link">Доски</a></li>
-            <li><a href="#" class="footer-link">Интеграции</a></li>
-          </ul>
-        </div>
-        <div class="footer-links">
-          <h4 class="footer-links-title">Компания</h4>
-          <ul class="footer-links-list">
-            <li><a href="#" class="footer-link">О нас</a></li>
-            <li><a href="#" class="footer-link">Блог</a></li>
-            <li><a href="#" class="footer-link">Карьера</a></li>
-            <li><a href="#" class="footer-link">Контакты</a></li>
-          </ul>
-        </div>
-        <div class="footer-links">
-          <h4 class="footer-links-title">Правовая информация</h4>
-          <ul class="footer-links-list">
-            <li><a href="#" class="footer-link">Условия использования</a></li>
-            <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
-            <li><a href="#" class="footer-link">Cookies</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-copyright">
-        <p>© 2025 SeiFlow. Все права защищены.</p>
-      </div>
-    </div>
-  </footer>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.utils && window.utils.restoreFilterState) {
+        const activeCategory = window.utils.restoreFilterState();
+        if (window.updateBoardVisibility) {
+          window.updateBoardVisibility();
+        }
+      }
+    });
+  </script>
+  <script src="./scripts/menu.js"></script>
+  <script src="./scripts/theme-switcher.js"></script>
+  <script src="./scripts/view-mode.js"></script>
+  <script src="./scripts/filters.js"></script>
+  <script src="./scripts/modal.js"></script>
+  <script src="./scripts/boardActions.js"></script>
+  <script src="./scripts/boardNavigation.js"></script>
+  <script src="./scripts/syncDashboard.js"></script>
+  <script src="./scripts/utils.js"></script>
 </body>
 
 </html>
