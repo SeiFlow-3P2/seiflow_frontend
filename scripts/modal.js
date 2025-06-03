@@ -1,42 +1,5 @@
+
 document.addEventListener("DOMContentLoaded", () => {
-  if (!window.lucide || typeof window.lucide.createIcons !== "function") {
-    console.error("Lucide не загружен или createIcons недоступен.");
-    return;
-  }
-
-  try {
-    lucide.createIcons();
-    console.log("Иконки Lucide инициализированы");
-  } catch (error) {
-    console.error("Ошибка при инициализации Lucide:", error);
-  }
-
-  const sanitizeInput = (input) => {
-    const div = document.createElement("div");
-    div.textContent = input;
-    return div.innerHTML;
-  };
-
-  const API_BASE_URL = "http://localhost:8080/v1";
-  const USER_ID = "user123"; // TODO: Заменить на реальный ID пользователя
-
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem("authToken") || "mock-token";
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    };
-  };
-
-  const handleResponse = async (response) => {
-    if (!response.ok) {
-      const error = await response.text();
-      throw new Error(`HTTP error ${response.status}: ${error}`);
-    }
-    if (response.status === 204) return {};
-    return response.json();
-  };
-
   const newBoardButton = document.getElementById("newBoardButton");
   const modal = document.getElementById("newBoardModal");
   const closeModal = document.getElementById("closeModal");
@@ -69,11 +32,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/boards`, {
-        method: "GET",
-        headers: getAuthHeaders(),
-      });
-      const data = await handleResponse(response);
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.boards.list}`,
+        {
+          method: "GET",
+          headers: config.utils.getAuthHeaders(),
+        }
+      );
+      const data = await config.utils.handleResponse(response);
       const boards = data.boards || [];
 
       boardsGrid.innerHTML = "";
@@ -100,8 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 <i data-lucide="${
                   categoryIcons[board.category] || "book-open"
                 }" class="${
-          categoryColors[board.category] || "yellow-icon"
-        }" aria-hidden="true"></i>
+                  categoryColors[board.category] || "yellow-icon"
+                }" aria-hidden="true"></i>
               </div>
               <div class="board-actions">
                 <button class="board-favorite-button" aria-label="Добавить в избранное">
@@ -109,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     board.favorite ? "favorite-active" : ""
                   }" aria-hidden="true"></i>
                 </button>
-                <button class="board-action-button" aria-label="Открыть меню действий для доски '${sanitizeInput(
+                <button class="board-action-button" aria-label="Открыть меню действий для доски '${config.utils.sanitizeInput(
                   board.name
                 )}'">
                   <i data-lucide="more-vertical" aria-hidden="true"></i>
@@ -123,26 +89,26 @@ document.addEventListener("DOMContentLoaded", () => {
               </div>
             </div>
             <h3 class="board-title">${
-              sanitizeInput(board.name) || "Новая доска"
+              config.utils.sanitizeInput(board.name) || "Новая доска"
             }</h3>
             <p class="board-description">${
-              sanitizeInput(board.description) || "Нет описания"
+              config.utils.sanitizeInput(board.description) || "Нет описания"
             }</p>
-            <div class="board-methodology">Методология: ${sanitizeInput(
+            <div class="board-methodology">Методология: ${config.utils.sanitizeInput(
               methodologyText
             )}</div>
             <div class="board-progress">
               <div class="progress-info">
-                <span>${sanitizeInput(board.progress + "%")}</span>
+                <span>${config.utils.sanitizeInput(board.progress + "%")}</span>
                 <span>100%</span>
               </div>
               <div class="progress-bar">
-                <div class="progress-fill" style="width: ${sanitizeInput(
+                <div class="progress-fill" style="width: ${config.utils.sanitizeInput(
                   board.progress
                 )}%;"></div>
               </div>
             </div>
-            <div class="board-last-edited">Последнее редактирование: ${sanitizeInput(
+            <div class="board-last-edited">Последнее редактирование: ${config.utils.sanitizeInput(
               new Date(board.updated_at).toLocaleString("ru-RU", {
                 day: "numeric",
                 month: "long",
@@ -166,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       boardsGrid.appendChild(newBoardCardElement);
 
-      lucide.createIcons({ container: boardsGrid });
+      config.ui.lucide.initialize({ container: boardsGrid });
     } catch (error) {
       console.error("Ошибка при загрузке досок:", error);
       boardsGrid.innerHTML = "<p>Ошибка загрузки досок. Попробуйте позже.</p>";
@@ -194,11 +160,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const boardId = boardCard.dataset.boardId;
       if (confirm("Вы уверены, что хотите удалить эту доску?")) {
         try {
-          const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
-            method: "DELETE",
-            headers: getAuthHeaders(),
-          });
-          await handleResponse(response);
+          const response = await fetch(
+            `${config.api.baseUrl}${config.api.endpoints.boards.get(boardId)}`,
+            {
+              method: "DELETE",
+              headers: config.utils.getAuthHeaders(),
+            }
+          );
+          await config.utils.handleResponse(response);
           await renderBoards();
         } catch (e) {
           console.error("Ошибка при удалении доски:", e);
@@ -211,16 +180,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const boardCard = favoriteButton.closest(".board-card");
       const boardId = boardCard.dataset.boardId;
       try {
-        const response = await fetch(`${API_BASE_URL}/boards/${boardId}`, {
-          method: "PATCH",
-          headers: getAuthHeaders(),
-          body: JSON.stringify({
-            favorite: !favoriteButton
-              .querySelector("i")
-              .classList.contains("favorite-active"),
-          }),
-        });
-        await handleResponse(response);
+        const response = await fetch(
+          `${config.api.baseUrl}${config.api.endpoints.boards.get(boardId)}`,
+          {
+            method: "PATCH",
+            headers: config.utils.getAuthHeaders(),
+            body: JSON.stringify({
+              favorite: !favoriteButton
+                .querySelector("i")
+                .classList.contains("favorite-active"),
+            }),
+          }
+        );
+        await config.utils.handleResponse(response);
         await renderBoards();
       } catch (e) {
         console.error("Ошибка при обновлении статуса избранного:", e);
@@ -307,18 +279,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/boards`, {
-        method: "POST",
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          name: title,
-          description,
-          category,
-          methodology,
-          user_id: USER_ID,
-        }),
-      });
-      await handleResponse(response);
+      const response = await fetch(
+        `${config.api.baseUrl}${config.api.endpoints.boards.create}`,
+        {
+          method: "POST",
+          headers: config.utils.getAuthHeaders(),
+          body: JSON.stringify({
+            name: title,
+            description,
+            category,
+            methodology,
+            user_id: "user123", // Предполагается, что user_id будет доступен через API или config
+          }),
+        }
+      );
+      await config.utils.handleResponse(response);
       newBoardForm.reset();
       categoryButtons.forEach((btn) => btn.classList.remove("active"));
       categoryButtons[0]?.classList.add("active");
