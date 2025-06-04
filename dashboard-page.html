@@ -4,489 +4,1030 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="./styles/dashboard-page.css">
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <link rel="stylesheet" href="./styles/profile-modal.css">
-  <link rel="stylesheet" href="./styles/subscription-modal.css">
+  <title>Календарь</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="./styles/calendar-page.css">
 </head>
 
 <body>
-  <div class="dashboard-container">
-    <header class="dashboard-header">
-      <div class="header-content">
-        <div class="header-left">
-          <button class="mobile-menu-button" aria-label="Открыть меню">
-            <i data-lucide="menu" aria-hidden="true"></i>
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <button class="mobile-menu-button" aria-label="Меню">
+          <i data-lucide="menu" class="icon-menu"></i>
+        </button>
+        <div class="logo">SeiFlow</div>
+      </div>
+      <div class="header-right">
+        <button class="notification-button" aria-label="Уведомления">
+          <i data-lucide="bell" class="icon-bell"></i>
+          <span class="notification-badge"></span>
+        </button>
+        <div class="user-dropdown">
+          <button class="user-button" aria-label="Профиль">
+            <div class="user-avatar">A</div>
+            <span class="user-name">Александр</span>
+            <i data-lucide="chevron-down" class="icon-chevron-down"></i>
           </button>
-          <div class="logo">SeiFlow</div>
-        </div>
-        <div class="header-right">
-          <button class="notification-button" aria-label="Уведомления">
-            <i data-lucide="bell" aria-hidden="true"></i>
-            <span class="notification-badge"></span>
-          </button>
-          <button id="openSubscriptionInfoBtn" class="header-btn">
-            Оформить подписку
-          </button>
-          <div class="user-dropdown">
-            <button class="user-button" aria-label="Открыть меню пользователя">
-              <div class="user-avatar">А</div>
-              <span class="user-name">Александр</span>
-              <i data-lucide="chevron-down" aria-hidden="true"></i>
-            </button>
-            <div class="dropdown-menu">
-              <a href="#" class="dropdown-item" id="profile">
-                <i data-lucide="user" class="dropdown-icon" aria-hidden="true"></i>
-                Профиль
-              </a>
-              <a href="#" class="dropdown-item" id="theme-toggle">
-                <i data-lucide="moon" class="dropdown-icon" id="theme-icon" aria-hidden="true"></i>
-                Тема
-              </a>
-              <a href="#" class="dropdown-item" id="logout-button">
-                <i data-lucide="log-out" class="dropdown-icon" aria-hidden="true"></i>
-                Выйти          
-              </a>
-            </div>
+          <div class="dropdown-menu">
+            <a href="#" class="dropdown-item">
+              <i data-lucide="user" class="dropdown-icon"></i>
+              Профиль
+            </a>
+            <a href="#" class="dropdown-item" id="theme-toggle">
+              <i data-lucide="moon" class="dropdown-icon" id="theme-icon" aria-hidden="true"></i>
+              Тема
+            </a>
+            <a href="#" class="dropdown-item">
+              <i data-lucide="log-out" class="dropdown-icon"></i>
+              Выйти
+            </a>
           </div>
         </div>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <div class="dashboard-content">
-      <aside class="desktop-sidebar">
-        <nav class="sidebar-nav">
-          <a href="/index.html" class="sidebar-link ">
-            <i data-lucide="home" class="sidebar-icon" aria-hidden="true"></i>
-            Главная
-          </a>
-          <a href="/dashboard-page.html" class="sidebar-link active">
-            <i data-lucide="trello" class="sidebar-icon" aria-hidden="true"></i>
-            Мои доски
-          </a>
-          <a href="/calendar-page.html" class="sidebar-link">
-            <i data-lucide="calendar" class="sidebar-icon" aria-hidden="true"></i>
-            Календарь
-          </a>
-          <a href="#" class="sidebar-link">
-            <i data-lucide="file-text" class="sidebar-icon" aria-hidden="true"></i>
-            Контент
-          </a>
-        </nav>
-        <div class="recent-boards">
-          <div class="sidebar-section-title">Недавние доски</div>
-          <div class="board-links">
-            <a href="#" class="board-link">
-              <i data-lucide="book-open" class="board-icon yellow-icon" aria-hidden="true"></i>
-              Изучение испанского языка
-            </a>
-            <a href="#" class="board-link">
-              <i data-lucide="heart" class="board-icon red-icon" aria-hidden="true"></i>
-              Фитнес-челлендж
-            </a>
-            <a href="#" class="board-link">
-              <i data-lucide="bar-chart-2" class="board-icon green-icon" aria-hidden="true"></i>
-              Личные финансы
-            </a>
-          </div>
-        </div>
-      </aside>
-
-      <aside class="mobile-sidebar">
-        <nav class="sidebar-nav">
-          <a href="#" class="sidebar-link active">
-            <i data-lucide="home" class="sidebar-icon" aria-hidden="true"></i>
-            Главная
-          </a>
-          <a href="#" class="sidebar-link">
-            <i data-lucide="trello" class="sidebar-icon" aria-hidden="true"></i>
-            Мои доски
-          </a>
-          <a href="#" class="sidebar-link">
-            <i data-lucide="calendar" class="sidebar-icon" aria-hidden="true"></i>
-            Календарь
-          </a>
-          <a href="#" class="sidebar-link">
-            <i data-lucide="file-text" class="sidebar-icon" aria-hidden="true"></i>
-            Контент
-          </a>
-        </nav>
-        <div class="recent-boards">
-          <div class="sidebar-section-title">Недавние доски</div>
-          <div class="board-links">
-            <a href="#" class="board-link">
-              <i data-lucide="book-open" class="board-icon yellow-icon" aria-hidden="true"></i>
-              Изучение испанского языка
-            </a>
-            <a href="#" class="board-link">
-              <i data-lucide="heart" class="board-icon red-icon" aria-hidden="true"></i>
-              Фитнес-челлендж
-            </a>
-            <a href="#" class="board-link">
-              <i data-lucide="bar-chart-2" class="board-icon green-icon" aria-hidden="true"></i>
-              Личные финансы
-            </a>
-          </div>
-        </div>
-      </aside>
-
-      <main class="main-content">
-        <div class="content-header">
-          <div class="header-info">
-            <h1>Мои доски</h1>
-            <p>Управляйте своими персонализированными досками</p>
+  <div class="calendar-wrapper">
+    <div class="calendar-main" id="calendarMain">
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <div class="header-title">
+            <h1>Календарь</h1>
+            <p>Управляйте своими событиями и расписанием</p>
           </div>
           <div class="header-actions">
-            <div class="view-toggle">
-              <button class="view-button" data-view="grid" aria-label="Вид сеткой">
-                <i data-lucide="grid" aria-hidden="true"></i>
-              </button>
-              <button class="view-button" data-view="list" aria-label="Вид списком">
-                <i data-lucide="list" aria-hidden="true"></i>
-              </button>
+            <div class="search-box">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" placeholder="Поиск событий..." class="search-input">
             </div>
-            <button class="new-board-button" id="newBoardButton">
-              <i data-lucide="plus" aria-hidden="true"></i>
-              Новая доска
+
+            <button class="new-event-button" id="newEventButton">
+              <i data-lucide="plus" class="plus-icon"></i>
+              <span>Новое событие</span>
             </button>
           </div>
         </div>
 
-        <div class="category-buttons category-filter">
-          <button class="category-button filter-category-button active" aria-pressed="true">Все доски</button>
-          <button class="category-button filter-category-button">Обучение</button>
-          <button class="category-button filter-category-button">Здоровье</button>
-          <button class="category-button filter-category-button">Финансы</button>
-          <button class="category-button filter-category-button">Личное</button>
-        </div>
-
-        <div class="boards-grid" id="boardsGrid">
-          <div class="new-board-card" id="newBoardCard">
-            <div class="new-board-icon">
-              <i data-lucide="plus" aria-hidden="true"></i>
-            </div>
-            <h3>Создать новую доску</h3>
-            <p>Добавьте персонализированную доску для любых целей</p>
-          </div>
-        </div>
-
-      </main>
-    </div>
-
-    <div class="modal" id="newBoardModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Создание новой доски</h2>
-          <button class="modal-close" id="closeModal">×</button>
-        </div>
-        <div class="modal-body">
-          <form id="newBoardForm">
-            <div class="form-group">
-              <label for="boardTitle">Название доски:</label>
-              <input type="text" id="boardTitle" name="boardTitle" required>
-            </div>
-            <div class="form-group">
-              <label for="boardDescription">Описание:</label>
-              <textarea id="boardDescription" name="boardDescription"></textarea>
-            </div>
-            <div class="form-group">
-              <label>Категория:</label>
-              <div class="category-buttons">
-                <input type="hidden" id="boardCategory" name="boardCategory" value="learning">
-                <button type="button" class="modal-category-button active" data-value="learning">Обучение</button>
-                <button type="button" class="modal-category-button" data-value="health">Здоровье</button>
-                <button type="button" class="modal-category-button" data-value="finance">Финансы</button>
-                <button type="button" class="modal-category-button" data-value="personal">Личное</button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Методология:</label>
-              <div class="methodology-buttons">
-                <input type="hidden" id="boardMethodology" name="boardMethodology" value="none">
-                <button type="button" class="methodology-button active" data-value="none">Без методологии</button>
-                <button type="button" class="methodology-button" data-value="scrum">Scrum</button>
-              </div>
-            </div>
-            <div class="modal-actions">
-              <button type="submit" class="modal-submit">Создать</button>
-              <button type="button" class="modal-cancel" id="cancelModal">Отмена</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <footer class="footer">
-      <div class="footer-container">
-        <div class="footer-grid">
-          <div class="footer-about">
-            <div class="footer-logo">SeiFlow</div>
-            <p class="footer-description">Интеллектуальная платформа для персонализированной организации жизни</p>
-          </div>
-          <div>
-            <h4 class="footer-links-title">Платформа</h4>
-            <ul class="footer-links-list">
-              <li><a href="#" class="footer-link">Возможности</a></li>
-              <li><a href="#" class="footer-link">Сервисы</a></li>
-              <li><a href="#" class="footer-link">Доски</a></li>
-              <li><a href="#" class="footer-link">Интеграции</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="footer-links-title">Компания</h4>
-            <ul class="footer-links-list">
-              <li><a href="#" class="footer-link">О нас</a></li>
-              <li><a href="#" class="footer-link">Блог</a></li>
-              <li><a href="#" class="footer-link">Карьера</a></li>
-              <li><a href="#" class="footer-link">Контакты</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="footer-links-title">Правовая информация</h4>
-            <ul class="footer-links-list">
-              <li><a href="#" class="footer-link">Условия использования</a></li>
-              <li><a href="#" class="footer-link">Политика конфиденциальности</a></li>
-              <li><a href="#" class="footer-link">Cookies</a></li>
-            </ul>
-          </div>
-        </div>
-        <div class="footer-copyright">© 2025 SeiFlow. Все права защищены.</div>
-      </div>
-    </footer>
-  </div>
-  <div class="modal-overlay hidden" id="profileModal">
-    <div class="profile-container">
-      <div class="profile-header">
-        <div class="avatar-container">
-          <div class="avatar">
-            <img id="avatarImage" src="" alt="Аватар" style="display: none;">
-            <i id="avatarIcon" data-lucide="user" class="avatar-icon"></i>
-          </div>
-          <button id="avatarActionButton" class="avatar-action-button">
-            <i id="actionIcon" data-lucide="plus"></i>
-          </button>
-          <input type="file" id="fileInput" accept="image/*" style="display: none;">
-        </div>
-        <div class="header-buttons">
-          <button class="settings-button">
-            <i data-lucide="settings"></i>
-          </button>
-          <button class="logout-button">
-            <i data-lucide="log-out"></i>
-          </button>
-        </div>
-      </div>
-      <div class="profile-info" style="display: block;" class="view-mode">
-        <h2 class="user-name">Александр Петров</h2>
-        <p class="user-bio">Разработчик программного обеспечения</p>
-        <div class="user-details">
-          <div class="detail-item">
-            <i data-lucide="mail" class="detail-icon"></i>
-            <span class="detail-text">[email protected]</span>
-          </div>
-          <div class="detail-item">
-            <i data-lucide="map-pin" class="detail-icon"></i>
-            <span class="detail-text">Москва, Россия</span>
-          </div>
-        </div>
-        <div class="stats-container">
-          <div class="stat-item">
-            <span class="stat-number">12</span>
-            <span class="stat-label">Проектов</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">3.4K</span>
-            <span class="stat-label">Подписчиков</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-number">257</span>
-            <span class="stat-label">Подписок</span>
-          </div>
-        </div>
-      </div>
-      <div class="edit-form" style="display: none;">
-        <div>
-          <label for="nameInput" class="input-label">Имя</label>
-          <input type="text" id="nameInput" class="input-field" value="Александр Петров">
-        </div>
-        <div>
-          <label for="bioInput" class="input-label">О себе</label>
-          <textarea id="bioInput" class="textarea-field">Разработчик программного обеспечения</textarea>
-        </div>
-        <div class="form-buttons">
-          <button class="cancel-button">Отмена</button>
-          <button class="save-button">Сохранить</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="subscriptionInfoModal" aria-hidden="true">
-    <div class="modal-container">
-      <div class="modal-accent-bar"></div>
-      <button class="modal-close-btn" id="closeInfoModalBtn">
-        <i data-lucide="x"></i>
-      </button>
-      <div class="modal-content">
-        <h2 class="modal-title">Оформить подписку</h2>
-        <div class="subscription-content">
-          <div class="subscription-header">
-            <h3 class="subscription-title">Премиум подписка</h3>
-            <p class="subscription-description">
-              Получите доступ ко всем функциям системы с нашей премиум подпиской.
-            </p>
-          </div>
-          <div class="features-box">
-            <h4 class="features-title">Что включено:</h4>
-            <ul class="features-list">
-              <li class="feature-item">
-                <i class="feature-icon" data-lucide="check-circle"></i>
-                Полный доступ ко всем функциям
-              </li>
-              <li class="feature-item">
-                <i class="feature-icon" data-lucide="check-circle"></i>
-                Приоритетная техническая поддержка
-              </li>
-              <li class="feature-item">
-                <i class="feature-icon" data-lucide="check-circle"></i>
-                Регулярные обновления
-              </li>
-              <li class="feature-item">
-                <i class="feature-icon" data-lucide="check-circle"></i>
-                Неограниченное количество проектов
-              </li>
-            </ul>
-          </div>
-          <div class="subscription-footer">
-            <div class="price-container">
-              <span class="price">499 ₽</span>
-              <span class="price-period">/мес</span>
-              <p class="price-note">Без скрытых платежей</p>
-            </div>
-            <button class="submit-btn" id="goToPaymentBtn">
-              Перейти к оплате
+        <div class="calendar-controls">
+          <div class="date-navigation">
+            <button class="nav-button" id="prevMonth">
+              <i data-lucide="chevron-left"></i>
             </button>
+            <h2 class="current-month" id="currentMonth">Июнь 2025</h2>
+            <button class="nav-button" id="nextMonth">
+              <i data-lucide="chevron-right"></i>
+            </button>
+            <button class="today-button" id="todayButton">Сегодня</button>
+          </div>
+          <div class="view-switcher">
+            <button class="view-button active" data-view="month">Месяц</button>
+            <button class="view-button" data-view="week">Неделя</button>
+          </div>
+        </div>
+
+        <div class="calendar-view month-view" id="monthView">
+          <div class="weekdays-header">
+            <div class="weekday">Пн</div>
+            <div class="weekday">Вт</div>
+            <div class="weekday">Ср</div>
+            <div class="weekday">Чт</div>
+            <div class="weekday">Пт</div>
+            <div class="weekday">Сб</div>
+            <div class="weekday">Вс</div>
+          </div>
+          <div class="month-grid" id="monthGrid">
+            <!-- Days will be generated by JavaScript -->
+          </div>
+        </div>
+
+        <div class="calendar-view week-view hidden" id="weekView">
+          <div class="week-grid">
+            <!-- Week view will be generated by JavaScript -->
+          </div>
+        </div>
+
+        <div class="calendar-view day-view hidden" id="dayView">
+          <div class="day-header">
+            <div class="day-title">Понедельник, 6 ноября</div>
+          </div>
+          <div class="day-grid">
+            <!-- Day view will be generated by JavaScript -->
           </div>
         </div>
       </div>
     </div>
-  </div>
-  
-  <div class="modal-overlay" id="subscriptionFormModal" aria-hidden="true">
-    <div class="modal-container">
-      <div class="modal-accent-bar"></div>
-      <button class="modal-close-btn" id="closeFormModalBtn">
-        <i data-lucide="x"></i>
-      </button>
-      <div class="modal-content">
-        <h2 class="modal-title">Оплата подписки</h2>
-        <div class="subscription-content">
-          <div class="payment-header">
-            <span class="payment-text">Первый месяц подписки</span>
-            <span class="payment-amount">499,00 ₽</span>
-          </div>
-          <div class="payment-header">
-            <span class="payment-text">К оплате</span>
-            <span class="payment-amount">499,00 ₽</span>
-          </div>
-          <form id="subscriptionForm" class="subscription-form">
-            <div class="form-group">
-              <label for="card" class="form-label">Данные карты</label>
-              <div class="input-container">
-                <i class="input-icon" data-lucide="credit-card"></i>
-                <input type="text" id="card" class="form-input" placeholder="1234 1234 1234 1234" maxlength="19">
-              </div>
-              <span id="card-error" class="error-message"></span>
-            </div>
-            <p class="terms-text">
-              Нажимая кнопку "Оплатить", вы соглашаетесь с
-              <a href="#" class="terms-link">условиями использования</a> и
-              <a href="#" class="terms-link">политикой конфиденциальности</a>
-            </p>
-            <button type="submit" class="submit-btn">Оплатить</button>
-          </form>
-        </div>
+
+    <div class="day-details" id="dayDetails">
+      <div class="day-details-header">
+        <h3 class="day-details-title" id="dayDetailsTitle">Детали дня</h3>
+        <button class="close-day-details" id="closeDayDetails">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="hourly-view" id="hourlyView">
+        <!-- Часовые слоты будут заполнены JavaScript -->
       </div>
     </div>
   </div>
+
+  <!-- Event Modal -->
+  <div class="modal-overlay hidden" id="eventModal">
+    <div class="event-modal">
+      <div class="modal-header">
+        <h3>Новое событие</h3>
+        <button class="close-button" id="closeModal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <form class="event-form" id="eventForm">
+        <div class="form-group">
+          <label>Название</label>
+          <input type="text" placeholder="Введите название события" id="eventTitle" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Дата начала</label>
+            <input type="date" id="startDate" required>
+          </div>
+          <div class="form-group">
+            <label>Время начала</label>
+            <input type="time" id="startTime">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Дата окончания</label>
+            <input type="date" id="endDate">
+          </div>
+          <div class="form-group">
+            <label>Время окончания</label>
+            <input type="time" id="endTime">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Доска</label>
+          <select id="eventBoard">
+            <option value="">Выберите доску</option>
+            <!-- Options will be populated dynamically -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Цвет события</label>
+          <div class="color-picker">
+            <button type="button" class="color-option blue active" data-color="blue" title="Синий"></button>
+            <button type="button" class="color-option red" data-color="red" title="Красный"></button>
+            <button type="button" class="color-option green" data-color="green" title="Зеленый"></button>
+            <button type="button" class="color-option yellow" data-color="yellow" title="Желтый"></button>
+            <button type="button" class="color-option purple" data-color="purple" title="Фиолетовый"></button>
+          </div>
+          <input type="hidden" id="eventColor" value="blue">
+        </div>
+        <div class="form-group">
+          <label>Описание</label>
+          <textarea rows="3" placeholder="Добавьте описание события" id="eventDescription"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="cancel-button" id="cancelButton">Отмена</button>
+          <button type="submit" class="submit-button">Создать</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="eventDetailsModal">
+    <div class="event-details-modal">
+      <div class="event-details-header">
+        <h3 class="event-details-title" id="eventDetailsTitle">Детали события</h3>
+        <button class="close-button" id="closeEventDetails">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div class="event-details-content" id="eventDetailsContent">
+        <!-- Содержимое будет заполнено JavaScript -->
+      </div>
+      <div class="button-container">
+        <button class="button button-edit" id="editEventButton">
+          <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+          </svg>
+          Редактировать
+        </button>
+
+        <button class="button button-delete" id="deleteEventButton">
+          <svg class="button-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"></path>
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            <line x1="10" x2="10" y1="11" y2="17"></line>
+            <line x1="14" x2="14" y1="11" y2="17"></line>
+          </svg>
+          Удалить
+        </button>
+
+        <button class="button button-close" id="closeEventDetailsButton">
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./scripts/theme-switcher.js"></script>\
+  <script src="./scripts/calendar.js"></script>
+  <script src="./js/env.js"></script>
+  <script src="./js/config.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Восстанавливаем состояние фильтров
-      if (window.utils && window.utils.restoreFilterState) {
-        const activeCategory = window.utils.restoreFilterState();
+    const userButton = document.querySelector(".user-button");
+    const dropdownMenu = document.querySelector(".dropdown-menu");
 
-        // Обновляем видимость карточек
-        if (window.updateBoardVisibility) {
-          window.updateBoardVisibility();
+    if (userButton && dropdownMenu) {
+      userButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        dropdownMenu.classList.toggle("active");
+        dropdownMenu.setAttribute(
+          "aria-expanded",
+          dropdownMenu.classList.contains("active")
+        );
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!userButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+          dropdownMenu.classList.remove("active");
+          dropdownMenu.setAttribute("aria-expanded", "false");
         }
-      }
-    });
-  </script>
-<script type="module">
-  import { logout } from "./scripts/auth.js"; // Уточнён путь
-  document.addEventListener("DOMContentLoaded", () => {
-    console.log("Скрипт dashboard-page загружен");
-    const profileModal = document.getElementById("profile-modal");
-    try {
-      if (window.utils && window.utils.restoreFilterState) {
-        console.log("Восстановление фильтров...");
-        const activeCategory = window.utils.restoreFilterState();
-        if (window.updateBoardVisibility) {
-          window.updateBoardVisibility();
+      });
+
+      userButton.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          dropdownMenu.classList.toggle("active");
+          dropdownMenu.setAttribute(
+            "aria-expanded",
+            dropdownMenu.classList.contains("active")
+          );
         }
-      }
-      const profileButton = document.querySelector(".dropdown-item[href='#profile']");
-      if (profileButton) {
-        console.log("Кнопка Профиль найдена");
-        profileButton.addEventListener("click", (e) => {
-          e.preventDefault();
-          console.log("Нажата кнопка Профиль");
-          profileModal.style.display = "flex";
-          profileModalOverlay.style.display = "block";
-          profileModal.querySelector(".user-name").focus();
-        });
-      } else {
-        console.error("Кнопка Профиль не найдена");
-      }
-      const logoutButton = document.getElementById("logout-button");
-      if (logoutButton) {
-        console.log("Кнопка Выйти найдена");
-        logoutButton.addEventListener("click", async (e) => {
-          e.preventDefault();
-          console.log("Нажата кнопка Выйти");
-          try {
-            await logout();
-          } catch (err) {
-            console.error("Ошибка при выходе:", err.message);
-            // Принудительный переход на index.html
-            localStorage.removeItem("accessToken");
-            localStorage.removeItem("refreshToken");
-            window.location.href = "index.html";
+      });
+
+      dropdownMenu.querySelectorAll(".dropdown-item").forEach((item) => {
+        item.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            item.click();
           }
         });
-      } else {
-        console.error("Кнопка logout-button не найдена");
-      }
-      lucide.createIcons();
-    } catch (err) {
-      console.error("Ошибка в скрипте dashboard-page:", err.message);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && dropdownMenu.classList.contains("active")) {
+          dropdownMenu.classList.remove("active");
+          dropdownMenu.setAttribute("aria-expanded", "false");
+        }
+      });
     }
-  });
-</script>
-  <script src="./scripts/menu.js"></script>
-  <script src="./scripts/theme-switcher.js"></script>
-  <script src="./scripts/view-mode.js"></script>
-  <script src="./scripts/filters.js"></script>
-  <script src="./scripts/modal.js"></script>
-  <script src="./scripts/boardActions.js"></script>
-  <script src="./scripts/boardNavigation.js"></script>
-  <script src="./scripts/syncDashboard.js"></script>
-  <script src="./scripts/utils.js"></script>
-  <script src="./scripts/profile-modal.js"></script>
-  <script src="./scripts/subscription-modal.js"></script>
-  <script src="./scripts/env.js"></script>
-  <script src="./scripts/config.js"></script>
+
+    lucide.createIcons();
+    let selectedColor = 'blue';
+    let events = JSON.parse(localStorage.getItem('calendarEvents')) || [];
+    let currentDate = new Date('2025-06-03T09:49:00-04:00'); // Current date and time: 09:49 AM EDT, June 03, 2025
+    let selectedCategory = null;
+
+    // Populate the board selection dropdown with existing boards
+    function populateBoardDropdown() {
+      const boardSelect = document.getElementById('eventBoard');
+      boardSelect.innerHTML = '<option value="">Выберите доску</option>'; // Reset options
+
+      const boards = JSON.parse(localStorage.getItem('boards') || "[]");
+      boards.forEach(board => {
+        const option = document.createElement('option');
+        option.value = board.boardId;
+        option.textContent = board.title;
+        boardSelect.appendChild(option);
+      });
+    }
+
+    // Sync tasks from all boards with calendar events
+    function syncTasksWithCalendar() {
+      const boards = JSON.parse(localStorage.getItem('boards') || "[]");
+      let allTasks = [];
+
+      // Collect tasks from all boards
+      boards.forEach(board => {
+        const tasks = JSON.parse(localStorage.getItem(`board-${board.boardId}-tasks`) || "[]");
+        tasks.forEach(task => {
+          task.boardId = board.boardId;
+          task.boardTitle = board.title;
+          allTasks.push(task);
+        });
+      });
+
+      allTasks.forEach(task => {
+        if (task.in_calendar && task.deadline) {
+          const existingEvent = events.find(e => e.taskId === task.id && e.boardId === task.boardId);
+          const eventData = {
+            id: existingEvent ? existingEvent.id : Date.now().toString(),
+            taskId: task.id,
+            boardId: task.boardId,
+            title: task.name,
+            startDate: task.deadline.split('T')[0],
+            startTime: task.deadline.split('T')[1]?.slice(0, 5) || '09:00',
+            color: 'blue',
+            description: task.description || '',
+            board: task.boardTitle
+          };
+
+          if (!existingEvent) {
+            events.push(eventData);
+          } else {
+            Object.assign(existingEvent, eventData);
+          }
+        }
+      });
+
+      // Remove events for tasks that are no longer in the calendar
+      events = events.filter(event => {
+        if (!event.taskId) return true;
+        const boardTasks = JSON.parse(localStorage.getItem(`board-${event.boardId}-tasks`) || "[]");
+        const task = boardTasks.find(t => t.id === event.taskId);
+        return task && task.in_calendar;
+      });
+
+      saveEvents();
+    }
+
+    // Color picker handlers
+    document.querySelectorAll('.color-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.color-option').forEach(opt => {
+          opt.classList.remove('active');
+        });
+        option.classList.add('active');
+        selectedColor = option.dataset.color;
+        document.getElementById('eventColor').value = selectedColor;
+      });
+    });
+
+    function saveEvents() {
+      localStorage.setItem('calendarEvents', JSON.stringify(events));
+    }
+
+    // DOM elements
+    const monthGrid = document.getElementById('monthGrid');
+    const currentMonthElement = document.getElementById('currentMonth');
+    const prevMonthButton = document.getElementById('prevMonth');
+    const nextMonthButton = document.getElementById('nextMonth');
+    const todayButton = document.getElementById('todayButton');
+    const newEventButton = document.getElementById('newEventButton');
+    const eventModal = document.getElementById('eventModal');
+    const closeModalButton = document.getElementById('closeModal');
+    const cancelButton = document.getElementById('cancelButton');
+    const eventForm = document.getElementById('eventForm');
+    const eventDetailsModal = document.getElementById('eventDetailsModal');
+    const eventDetailsContent = document.getElementById('eventDetailsContent');
+    const editEventButton = document.getElementById('editEventButton');
+    const deleteEventButton = document.getElementById('deleteEventButton');
+    const closeEventDetailsButton = document.getElementById('closeEventDetailsButton');
+    const closeEventDetails = document.getElementById('closeEventDetails');
+    const dayDetails = document.getElementById('dayDetails');
+    const closeDayDetails = document.getElementById('closeDayDetails');
+    const hourlyView = document.getElementById('hourlyView');
+    const dayDetailsTitle = document.getElementById('dayDetailsTitle');
+
+    // New event button handler
+    newEventButton.addEventListener('click', () => {
+      eventForm.reset();
+      populateBoardDropdown(); // Populate boards when opening the modal
+      selectedCategory = null;
+      document.querySelectorAll('.color-option').forEach(opt => {
+        opt.classList.remove('active');
+      });
+      document.querySelector('.color-option.blue').classList.add('active');
+      document.getElementById('eventColor').value = 'blue';
+      selectedColor = 'blue';
+
+      const today = new Date('2025-06-03T09:49:00-04:00');
+      const formattedDate = today.toISOString().split('T')[0];
+      document.getElementById('startDate').value = formattedDate;
+      document.getElementById('endDate').value = formattedDate;
+
+      eventModal.querySelector('h3').textContent = 'Новое событие';
+      eventModal.querySelector('.submit-button').textContent = 'Создать';
+      delete eventModal.dataset.editMode;
+      delete eventModal.dataset.eventId;
+
+      eventModal.classList.remove('hidden');
+    });
+
+    // View switcher
+    document.querySelectorAll('.view-button').forEach(button => {
+      button.addEventListener('click', function () {
+        document.querySelectorAll('.view-button').forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+
+        const dateNav = document.querySelector('.date-navigation');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const todayBtn = document.getElementById('todayButton');
+        const currentMonth = document.getElementById('currentMonth');
+
+        document.querySelectorAll('.calendar-view').forEach(view => view.classList.add('hidden'));
+
+        const view = this.dataset.view;
+        document.getElementById(`${view}View`).classList.remove('hidden');
+
+        if (view === 'month') {
+          prevMonthBtn.style.display = 'block';
+          nextMonthBtn.style.display = 'block';
+          todayBtn.style.display = 'block';
+          currentMonth.style.display = 'block';
+          renderCalendar();
+        } else if (view === 'week') {
+          prevMonthBtn.style.display = 'none';
+          nextMonthBtn.style.display = 'none';
+          todayBtn.style.display = 'none';
+          currentMonth.style.display = 'block';
+          renderWeekView(currentDate);
+        }
+
+        const searchInput = document.querySelector('.search-input');
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+      });
+    });
+
+    // Search functionality
+    document.querySelector('.search-input').addEventListener('input', function (e) {
+      const searchTerm = e.target.value.trim().toLowerCase();
+      const activeView = document.querySelector('.view-button.active').dataset.view;
+
+      if (searchTerm === '') {
+        if (activeView === 'month') {
+          document.querySelectorAll('.month-view .event').forEach(event => {
+            event.style.display = 'block';
+          });
+        } else if (activeView === 'week') {
+          document.querySelectorAll('.week-view .week-event').forEach(event => {
+            event.style.display = 'flex';
+          });
+        }
+        return;
+      }
+
+      if (activeView === 'month') {
+        document.querySelectorAll('.month-view .event').forEach(event => {
+          const eventText = event.textContent.toLowerCase();
+          event.style.display = eventText.includes(searchTerm) ? 'block' : 'none';
+        });
+      } else if (activeView === 'week') {
+        document.querySelectorAll('.week-view .week-event').forEach(event => {
+          const eventTitle = event.querySelector('.week-event-title')?.textContent.toLowerCase() || '';
+          const eventTime = event.querySelector('.week-event-time')?.textContent.toLowerCase() || '';
+          const eventText = `${eventTitle} ${eventTime}`;
+          event.style.display = eventText.includes(searchTerm) ? 'flex' : 'none';
+        });
+      }
+    });
+
+    // Initial setup
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!events || events.length === 0) {
+        events = [
+          {
+            id: Date.now().toString(),
+            title: "Пример события",
+            startDate: formatDate(new Date('2025-06-03T09:49:00-04:00')),
+            startTime: "10:00",
+            color: "blue"
+          }
+        ];
+        saveEvents();
+      }
+
+      document.querySelector('.view-button[data-view="month"]').classList.add('active');
+      document.getElementById('prevMonth').style.display = 'block';
+      document.getElementById('nextMonth').style.display = 'block';
+      document.getElementById('todayButton').style.display = 'block';
+      document.getElementById('currentMonth').style.display = 'block';
+      document.getElementById('monthView').classList.remove('hidden');
+      document.getElementById('weekView').classList.add('hidden');
+      syncTasksWithCalendar();
+      renderCalendar();
+    });
+
+    function renderWeekView(date) {
+      const weekGrid = document.querySelector('.week-grid');
+      if (!weekGrid) return;
+
+      syncTasksWithCalendar();
+      const monday = new Date(date);
+      monday.setDate(date.getDate() - (date.getDay() + 6) % 7);
+
+      weekGrid.innerHTML = '';
+      const searchTerm = document.querySelector('.search-input').value.trim().toLowerCase();
+
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(monday);
+        day.setDate(monday.getDate() + i);
+
+        const dayCell = document.createElement('div');
+        dayCell.className = 'week-day';
+
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'week-day-header';
+
+        const weekdayNames = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
+        dayHeader.innerHTML = `
+          <div class="week-day-name">${weekdayNames[day.getDay()]}</div>
+          <div class="week-day-number ${isToday(day) ? 'today' : ''}">${day.getDate()}</div>
+        `;
+
+        const eventsContainer = document.createElement('div');
+        eventsContainer.className = 'week-day-events';
+
+        const formattedDate = formatDate(day);
+        let dayEvents = events.filter(event => event.startDate === formattedDate);
+
+        if (searchTerm) {
+          dayEvents = dayEvents.filter(event =>
+            event.title?.toLowerCase().includes(searchTerm) ||
+            (event.startTime?.toLowerCase().includes(searchTerm)) ||
+            (event.endTime?.toLowerCase().includes(searchTerm)) ||
+            (event.description?.toLowerCase().includes(searchTerm))
+          );
+        }
+
+        dayEvents.forEach(event => {
+          if (!event || !event.id) {
+            console.warn('Invalid event found:', event);
+            return;
+          }
+
+          const eventElement = document.createElement('div');
+          eventElement.className = `week-event ${event.color || 'blue'}`;
+          eventElement.dataset.searchText = `
+            ${event.title?.toLowerCase() || ''} 
+            ${event.startTime || ''} 
+            ${event.endTime || ''} 
+            ${event.description || ''}
+          `.trim();
+
+          let timeDisplay = 'Весь день';
+          if (event.startTime) {
+            timeDisplay = event.startTime;
+            if (event.endTime) {
+              timeDisplay += ` - ${event.endTime}`;
+            }
+          }
+
+          eventElement.innerHTML = `
+            <div class="week-event-time">${timeDisplay}</div>
+            <div class="week-event-title">${event.title || 'Без названия'}</div>
+            ${event.description ? `<div class="week-event-description">${event.description}</div>` : ''}
+          `;
+
+          eventElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showEventDetails(event);
+          });
+
+          eventsContainer.appendChild(eventElement);
+        });
+
+        if (dayEvents.length === 0 && searchTerm) {
+          const noEventsMsg = document.createElement('div');
+          noEventsMsg.className = 'no-events-message';
+          noEventsMsg.textContent = 'События не найдены';
+          eventsContainer.appendChild(noEventsMsg);
+        }
+
+        dayCell.addEventListener('click', () => {
+          showDayDetails(day, dayEvents);
+        });
+
+        dayCell.appendChild(dayHeader);
+        dayCell.appendChild(eventsContainer);
+        weekGrid.appendChild(dayCell);
+      }
+
+      lucide.createIcons();
+    }
+
+    function formatDate(date) {
+      return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    }
+
+    function isToday(date) {
+      const today = new Date('2025-06-03T09:49:00-04:00');
+      return date.getDate() === today.getDate() &&
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear();
+    }
+
+    eventForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const isEditMode = eventModal.dataset.editMode === 'true';
+      const eventId = isEditMode ? eventModal.dataset.eventId : Date.now().toString();
+
+      const selectedBoardId = document.getElementById('eventBoard').value;
+      const boards = JSON.parse(localStorage.getItem('boards') || "[]");
+      const selectedBoard = boards.find(board => board.boardId === selectedBoardId);
+      const boardTitle = selectedBoard ? selectedBoard.title : '';
+
+      const newEvent = {
+        id: eventId,
+        title: document.getElementById('eventTitle').value,
+        startDate: document.getElementById('startDate').value,
+        startTime: document.getElementById('startTime').value,
+        endDate: document.getElementById('endDate').value || document.getElementById('startDate').value,
+        endTime: document.getElementById('endTime').value,
+        boardId: selectedBoardId,
+        board: boardTitle,
+        color: document.getElementById('eventColor').value,
+        description: document.getElementById('eventDescription').value
+      };
+
+      if (isEditMode) {
+        const index = events.findIndex(e => e.id === eventId);
+        if (index !== -1) {
+          events[index] = newEvent;
+          saveEvents();
+        }
+      } else {
+        events.push(newEvent);
+        saveEvents();
+      }
+
+      const activeView = document.querySelector('.view-button.active').dataset.view;
+      if (activeView === 'month') {
+        renderCalendar();
+      } else if (activeView === 'week') {
+        renderWeekView(currentDate);
+      }
+
+      eventModal.classList.add('hidden');
+      eventForm.reset();
+
+      delete eventModal.dataset.editMode;
+      delete eventModal.dataset.eventId;
+      eventModal.querySelector('h3').textContent = 'Новое событие';
+      eventModal.querySelector('.submit-button').textContent = 'Создать';
+
+      document.querySelectorAll('.color-option').forEach(opt => {
+        opt.classList.remove('active');
+      });
+      document.querySelector('.color-option.blue').classList.add('active');
+      document.getElementById('eventColor').value = 'blue';
+      selectedColor = 'blue';
+    });
+
+    closeModalButton.addEventListener('click', () => {
+      eventModal.classList.add('hidden');
+      eventForm.reset();
+      selectedCategory = null;
+      document.querySelectorAll('.category-tag').forEach(tag => {
+        tag.classList.remove('active');
+      });
+    });
+
+    cancelButton.addEventListener('click', () => {
+      eventModal.classList.add('hidden');
+      eventForm.reset();
+      selectedCategory = null;
+      document.querySelectorAll('.category-tag').forEach(tag => {
+        tag.classList.remove('active');
+      });
+    });
+
+    function handleNavigation() {
+      const activeView = document.querySelector('.view-button.active').dataset.view;
+      if (activeView === 'month') {
+        renderCalendar();
+      } else if (activeView === 'week') {
+        renderWeekView(currentDate);
+      }
+    }
+
+    prevMonthButton.addEventListener('click', () => {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      handleNavigation();
+    });
+
+    nextMonthButton.addEventListener('click', () => {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      handleNavigation();
+    });
+
+    todayButton.addEventListener('click', () => {
+      currentDate = new Date('2025-06-03T09:49:00-04:00');
+      handleNavigation();
+    });
+
+    function renderCalendar() {
+      syncTasksWithCalendar();
+      monthGrid.innerHTML = '';
+      const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+        "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+      currentMonthElement.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+      const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+      const firstDayOfWeek = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+      const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const prevMonthLastDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
+      const daysInPrevMonth = prevMonthLastDay.getDate();
+
+      for (let i = firstDayOfWeek - 1; i >= 0; i--) {
+        const day = daysInPrevMonth - i;
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, day);
+        addDayToCalendar(date, day, true);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+        const isTodayFlag = isToday(date);
+        addDayToCalendar(date, day, false, isTodayFlag);
+      }
+
+      const daysToAdd = 42 - (firstDayOfWeek + daysInMonth);
+      for (let day = 1; day <= daysToAdd; day++) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, day);
+        addDayToCalendar(date, day, true);
+      }
+    }
+
+    function addDayToCalendar(date, day, isOtherMonth, isToday = false) {
+      const dayCell = document.createElement('div');
+      dayCell.className = 'day-cell';
+
+      if (isOtherMonth) {
+        dayCell.classList.add('other-month');
+      }
+
+      if (isToday) {
+        dayCell.classList.add('today');
+      }
+
+      const dayNumber = document.createElement('div');
+      dayNumber.className = 'day-number';
+      dayNumber.textContent = day;
+      dayCell.appendChild(dayNumber);
+
+      const formattedDate = formatDate(date);
+      const dayEvents = events.filter(event => event.startDate === formattedDate);
+
+      dayEvents.forEach(event => {
+        if (!event || !event.id) {
+          console.warn('Invalid event found:', event);
+          return;
+        }
+
+        const eventElement = document.createElement('div');
+        eventElement.className = `event ${event.color || 'blue'}`;
+
+        const timeElement = document.createElement('div');
+        timeElement.className = 'event-time';
+        timeElement.textContent = event.startTime || 'Весь день';
+
+        const titleElement = document.createElement('div');
+        titleElement.className = 'event-title';
+        titleElement.textContent = event.title || 'Без названия';
+
+        eventElement.appendChild(timeElement);
+        eventElement.appendChild(titleElement);
+
+        eventElement.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showEventDetails(event);
+        });
+        dayCell.appendChild(eventElement);
+      });
+
+      dayCell.addEventListener('click', () => {
+        showDayDetails(date, dayEvents);
+      });
+
+      monthGrid.appendChild(dayCell);
+    }
+
+    function showDayDetails(date, dayEvents) {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      dayDetailsTitle.textContent = date.toLocaleDateString('ru-RU', options);
+
+      hourlyView.innerHTML = '';
+
+      for (let hour = 0; hour < 24; hour++) {
+        const hourSlot = document.createElement('div');
+        hourSlot.className = 'hour-slot';
+
+        const hourLabel = document.createElement('div');
+        hourLabel.className = 'hour-label';
+        hourLabel.textContent = `${hour}:00 - ${hour + 1}:00`;
+        hourSlot.appendChild(hourLabel);
+
+        const hourEvents = dayEvents.filter(event => {
+          if (!event.startTime) return false;
+          const eventHour = parseInt(event.startTime.split(':')[0]);
+          return eventHour === hour;
+        });
+
+        hourEvents.forEach(event => {
+          const eventElement = document.createElement('div');
+          eventElement.className = 'hour-event';
+          eventElement.textContent = `${event.startTime} - ${event.title}`;
+          eventElement.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showEventDetails(event);
+          });
+          hourSlot.appendChild(eventElement);
+        });
+
+        const addEventBtn = document.createElement('button');
+        addEventBtn.className = 'add-event-btn';
+        addEventBtn.innerHTML = '<i data-lucide="plus"></i> Добавить событие';
+        addEventBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openAddEventModalForHour(date, hour);
+        });
+        hourSlot.appendChild(addEventBtn);
+
+        hourlyView.appendChild(hourSlot);
+      }
+
+      dayDetails.classList.add('active');
+      lucide.createIcons();
+    }
+
+    function openAddEventModalForHour(date, hour) {
+      const formattedDate = formatDate(date);
+      const startTime = `${hour.toString().padStart(2, '0')}:00`;
+      const endTime = `${(hour + 1).toString().padStart(2, '0')}:00`;
+
+      document.getElementById('startDate').value = formattedDate;
+      document.getElementById('endDate').value = formattedDate;
+      document.getElementById('startTime').value = startTime;
+      document.getElementById('endTime').value = endTime;
+
+      populateBoardDropdown(); // Populate boards when opening the modal
+      eventModal.classList.remove('hidden');
+      document.getElementById('eventTitle').focus();
+    }
+
+    closeDayDetails.addEventListener('click', () => {
+      dayDetails.classList.remove('active');
+    });
+
+    function showEventDetails(event) {
+      if (!event || !event.id) {
+        console.error('Event or event.id is undefined:', event);
+        return;
+      }
+
+      eventDetailsContent.innerHTML = `
+        <div class="event-details-row">
+          <div class="event-details-label">Название:</div>
+          <div class="event-details-value">${event.title || 'Без названия'}</div>
+        </div>
+        <div class="event-details-row">
+          <div class="event-details-label">Дата:</div>
+          <div class="event-details-value">${formatEventDate(event.startDate, event.startTime, event.endDate, event.endTime)}</div>
+        </div>
+        ${event.board ? `
+        <div class="event-details-row">
+          <div class="event-details-label">Доска:</div>
+          <div class="event-details-value">${event.board}</div>
+        </div>` : ''}
+        <div class="event-details-row">
+          <div class="event-details-label">Цвет:</div>
+          <div class="event-details-value">
+            <div class="color-preview" style="background-color: ${getColorHex(event.color)}; width: 20px; height: 20px; border-radius: 50%; display: inline-block;"></div>
+            ${getColorName(event.color)}
+          </div>
+        </div>
+        ${event.description ? `
+        <div class="event-details-row">
+          <div class="event-details-label">Описание:</div>
+          <div class="event-details-value">${event.description}</div>
+        </div>` : ''}
+      `;
+
+      eventDetailsModal.dataset.eventId = event.id.toString();
+      eventDetailsModal.classList.remove('hidden');
+
+      editEventButton.onclick = () => {
+        document.getElementById('eventTitle').value = event.title || '';
+        document.getElementById('startDate').value = event.startDate || '';
+        document.getElementById('startTime').value = event.startTime || '';
+        document.getElementById('endDate').value = event.endDate || event.startDate;
+        document.getElementById('endTime').value = event.endTime || '';
+        document.getElementById('eventBoard').value = event.boardId || '';
+        document.getElementById('eventDescription').value = event.description || '';
+
+        document.querySelectorAll('.color-option').forEach(opt => {
+          opt.classList.remove('active');
+          if (opt.dataset.color === (event.color || 'blue')) {
+            opt.classList.add('active');
+            document.getElementById('eventColor').value = event.color || 'blue';
+            selectedColor = event.color || 'blue';
+          }
+        });
+
+        eventDetailsModal.classList.add('hidden');
+        eventModal.classList.remove('hidden');
+        eventModal.querySelector('h3').textContent = 'Редактировать событие';
+        eventModal.querySelector('.submit-button').textContent = 'Сохранить';
+        eventModal.dataset.editMode = 'true';
+        eventModal.dataset.eventId = event.id;
+
+        populateBoardDropdown(); // Populate boards when editing
+      };
+
+      deleteEventButton.onclick = () => {
+        if (confirm('Вы уверены, что хотите удалить это событие?')) {
+          events = events.filter(e => e.id !== event.id);
+          saveEvents();
+          eventDetailsModal.classList.add('hidden');
+          refreshCalendarView();
+        }
+      };
+
+      closeEventDetailsButton.onclick = closeEventDetails.onclick = () => {
+        eventDetailsModal.classList.add('hidden');
+      };
+
+      lucide.createIcons();
+    }
+
+    function formatEventDate(startDate, startTime, endDate, endTime) {
+      const start = new Date(`${startDate}T${startTime || '00:00'}`);
+      const end = new Date(`${endDate || startDate}T${endTime || '23:59'}`);
+
+      const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      };
+
+      if (!startTime && !endTime) {
+        return start.toLocaleDateString('ru-RU', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+
+      if (startDate === endDate || !endDate) {
+        return `${start.toLocaleDateString('ru-RU', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        })}, ${start.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+      }
+
+      return `${start.toLocaleString('ru-RU', options)} - ${end.toLocaleString('ru-RU', options)}`;
+    }
+
+    function getColorHex(color) {
+      const colors = {
+        blue: '#3b82f6',
+        red: '#ef4444',
+        green: '#10b981',
+        yellow: '#f59e0b',
+        purple: '#8b5cf6'
+      };
+      return colors[color] || '#3b5cf6';
+    }
+
+    function getColorName(color) {
+      const names = {
+        blue: 'Синий',
+        red: 'Красный',
+        green: 'Зеленый',
+        yellow: 'Желтый',
+        purple: 'Фиолетовый'
+      };
+      return names[color] || 'Синий';
+    }
+
+    function refreshCalendarView() {
+      const activeView = document.querySelector('.view-button.active').dataset.view;
+      if (activeView === 'month') {
+        renderCalendar();
+      } else if (activeView === 'week') {
+        renderWeekView(currentDate);
+      }
+      dayDetails.classList.remove('active');
+      lucide.createIcons();
+    }
+  </script>
 </body>
 
 </html>
