@@ -64,9 +64,9 @@ const config = {
   // Page Paths: Пути к страницам приложения.
   paths: {
     login: "/login.html", // Страница входа/регистрации.
-    boards: "/boards.html", // Страница со списком всех досок.
+    boards: "/dashboard-page.html", // Страница со списком всех досок.
     board: (boardId) => `/board.html?boardId=${boardId}`, // Страница конкретной доски с передачей ID в параметрах.
-    calendar: "/calendar.html", // Страница календаря.
+    calendar: "/calendar-page.html", // Страница календаря.
   },
 
   // UI Settings: Настройки, связанные с пользовательским интерфейсом.
